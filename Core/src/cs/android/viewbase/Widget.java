@@ -43,7 +43,6 @@ import android.widget.ToggleButton;
 import android.widget.ViewAnimator;
 import cs.android.HasContext;
 import cs.android.aq.CSQuery;
-import cs.android.view.ImageViewPresenter;
 import cs.java.common.Point;
 
 public class Widget<T extends View> extends ContextPresenter implements IsView {
@@ -357,10 +356,6 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 
 	public void setImageValue(int imageViewId, int imageResource) {
 		getImageView(imageViewId).setImageResource(imageResource);
-	}
-
-	public void setImageValue(int imageViewId, String imageUrl) {
-		new ImageViewPresenter(getImageView(imageViewId), imageUrl);
 	}
 
 	public void setInvisible() {
