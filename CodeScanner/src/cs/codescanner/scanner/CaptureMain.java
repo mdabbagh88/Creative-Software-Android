@@ -100,7 +100,7 @@ public class CaptureMain implements SurfaceHolder.Callback {
 		}
 	}
 
-	@SuppressWarnings("deprecation") public void onResume() {
+	public void onResume() {
 		cameraManager = new CameraManager(activity);
 
 		viewfinderView = (ViewfinderView) activity.findViewById(R.id.viewfinder_view);
@@ -130,10 +130,10 @@ public class CaptureMain implements SurfaceHolder.Callback {
 		onResetStatus();
 	}
 
-	 public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 	}
 
-	 public void surfaceCreated(SurfaceHolder holder) {
+	public void surfaceCreated(SurfaceHolder holder) {
 		if (holder == null) info("*** WARNING *** surfaceCreated() gave us a null surface!");
 		if (!hasSurface) {
 			hasSurface = true;
@@ -141,7 +141,7 @@ public class CaptureMain implements SurfaceHolder.Callback {
 		}
 	}
 
-	 public void surfaceDestroyed(SurfaceHolder holder) {
+	public void surfaceDestroyed(SurfaceHolder holder) {
 		hasSurface = false;
 	}
 

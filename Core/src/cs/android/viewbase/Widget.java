@@ -358,7 +358,6 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		getImageView(imageViewId).setImageResource(imageResource);
 	}
 
-
 	public void setInvisible() {
 		setVisibility(View.INVISIBLE);
 	}
