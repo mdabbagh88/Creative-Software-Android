@@ -10,6 +10,7 @@ import static cs.java.lang.Lang.no;
 
 import java.util.Map;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -22,9 +23,8 @@ import cs.java.json.JSONContainer;
 import cs.java.json.JSONData;
 import cs.java.json.JSONObject;
 
+@SuppressLint("CommitPrefEdits")
 public class Settings extends ContextPresenter {
-
-	public static final String SHARED_PREFERENCES_KEY = "settings";
 
 	private static Settings instance = new Settings();
 
@@ -35,13 +35,27 @@ public class Settings extends ContextPresenter {
 	private final SharedPreferences preferences;
 
 	public Settings() {
-		preferences = getPreferences();
+		preferences = getPreferences("settings");
+	}
+
+	public Settings(String name) {
+		preferences = getPreferences(name);
+	}
+
+	public void clear() {
+		Editor editor = preferences.edit();
+		editor.clear();
+		save(editor);
 	}
 
 	public void clear(String key) {
 		Editor editor = preferences.edit();
 		editor.remove(key);
 		save(editor);
+	}
+
+	protected SharedPreferences getPreferences(String key) {
+		return context().getSharedPreferences(key, Context.MODE_PRIVATE);
 	}
 
 	public boolean has(String key) {
@@ -70,6 +84,22 @@ public class Settings extends ContextPresenter {
 		return preferences.getBoolean(key, defaultValue);
 	}
 
+	public Integer loadInteger(String key) {
+		return preferences.getInt(key, 0);
+
+	}
+
+	public Integer loadInteger(String key, int defaultValue) {
+		return preferences.getInt(key, defaultValue);
+	}
+
+	private JSONContainer loadJSONContainer(String key) {
+		String loadString = loadString(key);
+		if (no(loadString)) return null;
+		JSONContainer parsed = json().parse(loadString);
+		return parsed;
+	}
+
 	public JSONObject loadObject(String key) {
 		JSONContainer container = loadJSONContainer(key);
 		return is(container) ? container.asObject() : null;
@@ -79,13 +109,21 @@ public class Settings extends ContextPresenter {
 		return preferences.getString(key, null);
 	}
 
-	public Integer loadInteger(String key) {
-		return preferences.getInt(key, 0);
-
+	private void save(final Editor editor) {
+		if (respondsTo(editor, "apply"))
+			invoke(editor, "apply");
+		else new CSAsyncTask() {
+			@Override public void run() {
+				editor.commit();
+			}
+		};
 	}
-	
-	public Integer loadInteger(String key, int defaultValue) {
-		return preferences.getInt(key, defaultValue);
+
+	protected void save(String... keysvalues) {
+		Editor editor = preferences.edit();
+		for (MapItem<String, String> keyvalue : iterate(map((Object[]) keysvalues)))
+			editor.putString(keyvalue.key(), keyvalue.value());
+		save(editor);
 	}
 
 	public void save(String key, Boolean value) {
@@ -131,34 +169,5 @@ public class Settings extends ContextPresenter {
 		Editor editor = preferences.edit();
 		editor.putString(key, value);
 		save(editor);
-	}
-
-	protected SharedPreferences getPreferences() {
-		return context().getSharedPreferences(SHARED_PREFERENCES_KEY, Context.MODE_PRIVATE);
-	}
-
-	protected void save(String... keysvalues) {
-		Editor editor = preferences.edit();
-		for (MapItem<String, String> keyvalue : iterate(map((Object[]) keysvalues)))
-			editor.putString(keyvalue.key(), keyvalue.value());
-		save(editor);
-	}
-
-	private JSONContainer loadJSONContainer(String key) {
-		String loadString = loadString(key);
-		if (no(loadString)) return null;
-		JSONContainer parsed = json().parse(loadString);
-		return parsed;
-	}
-
-	private void save(final Editor editor) {
-		if (respondsTo(editor, "apply"))
-			invoke(editor, "apply");
-		else new CSAsyncTask() {
-			@Override
-			public void run() {
-				editor.commit();
-			}
-		};
 	}
 }

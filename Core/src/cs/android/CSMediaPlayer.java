@@ -28,31 +28,43 @@ public class CSMediaPlayer extends ActivityWidget {
 
 	public void play(int resource) {
 		if (mediaPlayer != null) {
-			try {
-				mediaPlayer.stop();
-			} catch (IllegalStateException e) {
-				e.printStackTrace();
-			}
-			try {
-				mediaPlayer.reset();
-			} catch (IllegalStateException e) {
-				e.printStackTrace();
-			}
-			try {
-				mediaPlayer.release();
-			} catch (IllegalStateException e) {
-				e.printStackTrace();
-			}
+			stop();
+			reset();
+			release();
 		}
 		mediaPlayer = MediaPlayer.create(context(), resource);
 		mediaPlayer.start();
 	}
 
+	public void stop() {
+		try {
+			mediaPlayer.stop();
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void release() {
+		try {
+			mediaPlayer.release();
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void reset() {
+		try {
+			mediaPlayer.reset();
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+		}
+	}
+
 	@Override protected void onPause() {
 		super.onPause();
 		if (is(mediaPlayer)) {
-			mediaPlayer.reset();
-			mediaPlayer.release();
+			reset();
+			release();
 		}
 	}
 }

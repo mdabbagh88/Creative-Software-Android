@@ -313,7 +313,7 @@ public abstract class ActivityWidget extends Widget<View> implements IActivityWi
 		activity().finish();
 	}
 
-	private void listenParent() {
+	public void listenParent() {
 		if (is(parent))
 			parentEventsTask = new Task(parent.getOnCreate(), parent.getOnStart(), parent.getOnResume(),
 					parent.getOnPause(), parent.getOnStop(), parent.getOnSaveInstance(),

@@ -5,6 +5,7 @@ import static cs.java.lang.Lang.is;
 import static cs.java.lang.Lang.no;
 import static cs.java.lang.Lang.set;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -51,16 +52,12 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		return new LayoutId(id);
 	}
 
-	@SuppressWarnings("unchecked") public <V extends View> V getView(int id, Class<V> clazz) {
-		return (V) getView(id);
-	}
-
-	public SeekBar getSeekBar(int i) {
-		return (SeekBar) getView(i);
-	}
-
 	private View view;
+
 	private CSQuery aq;
+
+	Widget() {
+	}
 
 	public Widget(HasContext hascontext) {
 		super(hascontext);
@@ -82,8 +79,7 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 
 	public Widget(final View parent, LayoutId layoutId) {
 		super(new HasContext() {
-			@Override
-			public Context context() {
+			@Override public Context context() {
 				return parent.getContext();
 			}
 		});
@@ -92,9 +88,6 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 
 	public Widget(Widget<?> parent, int viewId) {
 		this(parent.getView(viewId));
-	}
-
-	Widget() {
 	}
 
 	public CSQuery aq() {
@@ -126,8 +119,7 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		return (ProgressBar) asView();
 	}
 
-	@Override
-	@SuppressWarnings("unchecked") public T asView() {
+	@Override @SuppressWarnings("unchecked") public T asView() {
 		return (T) view;
 	}
 
@@ -141,16 +133,13 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		animation.setDuration(300);
 		animation.setInterpolator(new AccelerateInterpolator());
 		animation.setAnimationListener(new AnimationListener() {
-			@Override
-			public void onAnimationEnd(Animation animation) {
+			@Override public void onAnimationEnd(Animation animation) {
 			}
 
-			@Override
-			public void onAnimationRepeat(Animation animation) {
+			@Override public void onAnimationRepeat(Animation animation) {
 			}
 
-			@Override
-			public void onAnimationStart(Animation animation) {
+			@Override public void onAnimationStart(Animation animation) {
 			}
 		});
 		asView().startAnimation(animation);
@@ -162,17 +151,14 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		animation.setDuration(300);
 		animation.setInterpolator(new AccelerateInterpolator());
 		animation.setAnimationListener(new AnimationListener() {
-			@Override
-			public void onAnimationEnd(Animation animation) {
+			@Override public void onAnimationEnd(Animation animation) {
 				hideView();
 			}
 
-			@Override
-			public void onAnimationRepeat(Animation animation) {
+			@Override public void onAnimationRepeat(Animation animation) {
 			}
 
-			@Override
-			public void onAnimationStart(Animation animation) {
+			@Override public void onAnimationStart(Animation animation) {
 			}
 		});
 		asView().startAnimation(animation);
@@ -252,6 +238,10 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		return (ScrollView) getView(id);
 	}
 
+	public SeekBar getSeekBar(int i) {
+		return (SeekBar) getView(i);
+	}
+
 	public String getTextValue(int id) {
 		if (is(getTextView(id))) return getTextView(id).getText().toString();
 		return null;
@@ -259,6 +249,10 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 
 	public TextView getTextView(int id) {
 		return (TextView) getView(id);
+	}
+
+	public TimePicker getTimePicker(int id) {
+		return (TimePicker) getView(id);
 	}
 
 	public ToggleButton getToggleButton(int id) {
@@ -279,16 +273,16 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		return child;
 	}
 
+	@SuppressWarnings("unchecked") public <V extends View> V getView(int id, Class<V> clazz) {
+		return (V) getView(id);
+	}
+
 	public ViewAnimator getViewAnimator(int id) {
 		return (ViewAnimator) getView(id);
 	}
 
 	public ViewGroup getViewGroup(int id) {
 		return (ViewGroup) getView(id);
-	}
-
-	public TimePicker getTimePicker(int id) {
-		return (TimePicker) getView(id);
 	}
 
 	public WebView getWebView(int id) {
@@ -330,6 +324,10 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		return getCompoundButton(id).isChecked();
 	}
 
+	public boolean isPortraite() {
+		return context().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+	}
+
 	public boolean isVisible() {
 		return asView().getVisibility() == View.VISIBLE;
 	}
@@ -356,6 +354,14 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 
 	public void setImageValue(int imageViewId, int imageResource) {
 		getImageView(imageViewId).setImageResource(imageResource);
+	}
+
+	protected void setImageViewResource(int viewId, int drawable) {
+		getImageView(viewId).setImageResource(drawable);
+	}
+
+	protected void setInflateView(int layoutId) {
+		view = inflateLayout(layoutId);
 	}
 
 	public void setInvisible() {
@@ -411,16 +417,16 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		view.setLayoutParams(layoutParams);
 	}
 
-	public void setTextValue(int viewId, String text) {
-		getTextView(viewId).setText(text);
-	}
-
 	public void setTextValue(int viewId, int stringId) {
 		getTextView(viewId).setText(getString(stringId));
 	}
 
 	public void setTextValue(int viewId, int stringId, Object... args) {
 		getTextView(viewId).setText(getString(stringId, args));
+	}
+
+	public void setTextValue(int viewId, String text) {
+		getTextView(viewId).setText(text);
 	}
 
 	public void setView(View view) {
@@ -473,14 +479,6 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		DisplayMetrics metrics = resources.getDisplayMetrics();
 		float px = dp * (metrics.densityDpi / 160f);
 		return px;
-	}
-
-	protected void setImageViewResource(int viewId, int drawable) {
-		getImageView(viewId).setImageResource(drawable);
-	}
-
-	protected void setInflateView(int layoutId) {
-		view = inflateLayout(layoutId);
 	}
 
 }

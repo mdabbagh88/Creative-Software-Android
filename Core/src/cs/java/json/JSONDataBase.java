@@ -36,16 +36,16 @@ public abstract class JSONDataBase implements JSONData {
 		data.put(key, json().create(value));
 	}
 
-	public Number getNumber(String key) {
-		return data.getNumber(key);
-	}
-
 	public Integer getInteger(String key) {
 		return data.getInteger(key);
 	}
 
+	public Double getDouble(String key) {
+		return data.getDouble(key);
+	}
+
 	public String getNumberString(String key) {
-		return getNumber(key) + "";
+		return data.getNumber(key) + "";
 	}
 
 	public JSONObject getObject(String key) {

@@ -2,6 +2,7 @@ package cs.android.view;
 
 import static cs.java.lang.Lang.equalOne;
 import static cs.java.lang.Lang.is;
+import static cs.java.lang.Lang.no;
 import cs.android.viewbase.Widget;
 import cs.java.lang.Call;
 import android.view.KeyEvent;
@@ -29,9 +30,13 @@ public abstract class OnEditorActionAdapter implements OnEditorActionListener, C
 		return false;
 	}
 
-	@Override
-	public boolean onEditorAction(TextView view, int action, KeyEvent event) {
-		if (action == _action) {
+	@Override public boolean onEditorAction(TextView view, int action, KeyEvent event) {
+		if (no(_action)) {
+			if (isSubmitAction(action, event)) {
+				onCall(view);
+				return true;
+			}
+		} else if (action == _action) {
 			onCall(view);
 			return true;
 		}
