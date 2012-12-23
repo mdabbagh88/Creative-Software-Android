@@ -12,56 +12,50 @@ public class ListImpl<T> extends ArrayList<T> implements List<T> {
 		super(list);
 	}
 
-	@Override
-	public List<T> add(T... items) {
+	@Override public List<T> add(T... items) {
 		for (T item : items)
 			add(item);
 		return this;
 	}
 
-	 @Override
-	public T at(int index) {
+	@Override public T at(int index) {
 		if (index < size() && index >= 0) return get(index);
 		return null;
 	}
 
-	@Override
-	public boolean delete(T item) {
+	@Override public boolean delete(T item) {
 		return remove(item);
 	}
 
-	 @Override
-	public T first() {
+	@Override public T first() {
 		return at(0);
 	}
 
-	@Override
-	public int getIndex(T item) {
+	@Override public int getIndex(T item) {
 		return indexOf(item);
 	}
 
-	 @Override
-	public boolean hasContents() {
+	@Override public boolean hasContents() {
 		return size() > 0;
 	}
 
-	@Override
-	public T last() {
+	@Override public T last() {
 		return at(size() - 1);
 	}
 
-	@Override
-	public List<T> range(int fromIndex) {
+	@Override public List<T> range(int fromIndex) {
 		return range(fromIndex, size());
 	}
 
-	@Override
-	public List<T> range(int fromIndex, int toIndex) {
+	@Override public List<T> range(int fromIndex, int toIndex) {
 		return new ListImpl<T>(subList(fromIndex, toIndex));
 	}
 
-	 @Override
-	public T removeLast() {
+	@Override public T removeLast() {
 		return remove(size() - 1);
+	}
+
+	public boolean isLast(T item) {
+		return last() == item;
 	}
 }

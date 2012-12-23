@@ -17,6 +17,8 @@ public interface List<T> extends java.util.List<T> {
 		@Deprecated
     int indexOf(Object arg0);
 
+    boolean isLast(T item);
+    
     T last();
 
     List<T> range(int fromIndex);
