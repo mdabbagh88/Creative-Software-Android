@@ -15,10 +15,6 @@ public interface LangCore {
 
 	void debug(Object... values);
 
-	void doLater(int delay_miliseconds, Runnable runnable);
-
-	void doLater(Runnable runnable);
-
 	void error(Throwable e, Object... values);
 
 	void warn(Object... values);
@@ -32,4 +28,5 @@ public interface LangCore {
 	void trace(Object... values);
 
 	String urlEncode(String argument);
+
 }

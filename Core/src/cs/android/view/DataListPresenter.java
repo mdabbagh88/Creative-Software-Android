@@ -2,7 +2,6 @@ package cs.android.view;
 
 import static cs.android.lang.AndroidLang.event;
 import static cs.java.lang.Lang.fire;
-import static cs.java.lang.Lang.info;
 import static cs.java.lang.Lang.list;
 import static cs.java.lang.Lang.no;
 import android.os.SystemClock;
@@ -19,23 +18,19 @@ import cs.java.event.Event;
 public class DataListPresenter<RowType> extends ActivityWidget {
 	private class ListAdapter extends BaseAdapter {
 
-		@Override
-		public int getCount() {
+		@Override public int getCount() {
 			return getItemsCount();
 		}
 
-		@Override
-		public Object getItem(int position) {
+		@Override public Object getItem(int position) {
 			return dataList.get(position);
 		}
 
-		@Override
-		public long getItemId(int position) {
+		@Override public long getItemId(int position) {
 			return position;
 		}
 
-		@Override
-		public View getView(int position, View view, ViewGroup parent) {
+		@Override public View getView(int position, View view, ViewGroup parent) {
 			return listAdapterGetView(position, view);
 		}
 	}
@@ -66,14 +61,42 @@ public class DataListPresenter<RowType> extends ActivityWidget {
 		return dataList;
 	}
 
+	private int getItemsCount() {
+		return dataList.size();
+	}
+
 	public Event<List<RowType>> getOnLoad() {
 		return onLoad;
+	}
+
+	private View listAdapterGetView(int position, View view) {
+		RowView<RowType> rowView;
+		if (no(view)) {
+			rowView = viewFactory.create(position);
+			view = rowView.asView();
+			view.setTag(rowView);
+		} else rowView = (RowView<RowType>) view.getTag();
+		rowView.load(dataList.get(position));
+		return view;
 	}
 
 	public void load(List<RowType> list) {
 		dataList.addAll(list);
 		listAdapter.notifyDataSetChanged();
 		fire(onLoad, list);
+	}
+
+	@Override protected void onPause() {
+		super.onPause();
+		saveSelection();
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" }) @Override protected void onResume() {
+		super.onResume();
+		if (dataList.hasContents()) {
+			((AdapterView) asAbsListView()).setAdapter(listAdapter);
+			restoreSelection();
+		}
 	}
 
 	public void prependData(RowType status) {
@@ -88,7 +111,6 @@ public class DataListPresenter<RowType> extends ActivityWidget {
 	@SuppressWarnings({ "unchecked", "rawtypes" }) public void reload(List<RowType> list) {
 		saveSelection();
 		dataList.clear();
-		info(asAbsListView());
 		((AdapterView) asAbsListView()).setAdapter(listAdapter);
 		load(list);
 		restoreSelection();
@@ -111,34 +133,6 @@ public class DataListPresenter<RowType> extends ActivityWidget {
 
 	public void setEmptyView(int layoutId) {
 		asAbsListView().setEmptyView(inflateLayout(layoutId));
-	}
-
-	@Override protected void onPause() {
-		super.onPause();
-		saveSelection();
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" }) @Override protected void onResume() {
-		super.onResume();
-		if (dataList.hasContents()) {
-			((AdapterView) asAbsListView()).setAdapter(listAdapter);
-			restoreSelection();
-		}
-	}
-
-	private int getItemsCount() {
-		return dataList.size();
-	}
-
-	private View listAdapterGetView(int position, View view) {
-		RowView<RowType> rowView;
-		if (no(view)) {
-			rowView = viewFactory.create(position);
-			view = rowView.asView();
-			view.setTag(rowView);
-		} else rowView = (RowView<RowType>) view.getTag();
-		rowView.load(dataList.get(position));
-		return view;
 	}
 
 }

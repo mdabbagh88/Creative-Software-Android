@@ -22,6 +22,8 @@ import cs.java.json.JSONArray;
 import cs.java.json.JSONContainer;
 import cs.java.json.JSONData;
 import cs.java.json.JSONObject;
+import cs.java.model.Credentials;
+import cs.java.model.CredentialsImpl;
 
 @SuppressLint("CommitPrefEdits")
 public class Settings extends ContextPresenter {
@@ -33,19 +35,42 @@ public class Settings extends ContextPresenter {
 	}
 
 	private final SharedPreferences preferences;
+	private final String _name;
 
 	public Settings() {
-		preferences = getPreferences("settings");
+		this("settings");
+	}
+
+	public String name() {
+		return _name;
+	}
+
+	public static final String SETTING_USERNAME = "username";
+	public static final String SETTING_PASSWORD = "password";
+
+	public void clearCredentials() {
+		clear(SETTING_USERNAME);
+		clear(SETTING_PASSWORD);
+	}
+
+	public Credentials loadCredentials() {
+		String username = loadString(SETTING_USERNAME);
+		String password = loadString(SETTING_PASSWORD);
+		if (is(username, password)) return new CredentialsImpl(username, password);
+		return null;
+	}
+
+	public void save(Credentials credentials) {
+		save(SETTING_USERNAME, credentials.getUsername(), SETTING_PASSWORD, credentials.getPassword());
 	}
 
 	public Settings(String name) {
+		_name = name;
 		preferences = getPreferences(name);
 	}
 
 	public void clear() {
-		Editor editor = preferences.edit();
-		editor.clear();
-		save(editor);
+		preferences.edit().clear().commit();
 	}
 
 	public void clear(String key) {
@@ -170,4 +195,5 @@ public class Settings extends ContextPresenter {
 		editor.putString(key, value);
 		save(editor);
 	}
+
 }

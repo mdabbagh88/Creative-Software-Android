@@ -3,6 +3,7 @@ package cs.java.lang;
 import java.util.Collection;
 import java.util.Date;
 
+import cs.android.lang.DoLaterProcess;
 import cs.java.collections.GenericIterator;
 import cs.java.collections.HashMap;
 import cs.java.collections.Iteration;
@@ -107,12 +108,12 @@ public class Lang {
 		impl.debug(values);
 	}
 
-	public static void doLater(int delay_miliseconds, final Runnable runnable) {
-		impl.doLater(delay_miliseconds, runnable);
+	public static DoLaterProcess doLater(int delay_miliseconds, final Runnable runnable) {
+		return new DoLaterProcess(runnable, delay_miliseconds);
 	}
 
-	public static void doLater(final Runnable runnable) {
-		impl.doLater(runnable);
+	public static DoLaterProcess doLater(final Runnable runnable) {
+		return new DoLaterProcess(runnable);
 	}
 
 	public static boolean empty(Object... objects) {
@@ -332,9 +333,8 @@ public class Lang {
 	public static boolean is(byte object) {
 		return set(object);
 	}
-	
-	
-	public static long currentTime(){
+
+	public static long currentTime() {
 		return new Date().getTime();
 	}
 
