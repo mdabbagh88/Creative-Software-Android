@@ -1,6 +1,7 @@
 package cs.android;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
@@ -48,4 +49,8 @@ public interface IActivityWidget extends HasActivity, IsView {
 	void onDeinitialize(Bundle state);
 
 	void onInitialize(Bundle state);
+
+	void setDialog(Dialog dialog);
+
+	void goBack();
 }

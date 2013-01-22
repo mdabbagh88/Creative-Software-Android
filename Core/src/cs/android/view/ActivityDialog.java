@@ -105,6 +105,12 @@ public class ActivityDialog extends ActivityWidget {
 			if (set(titleId)) builder.setTitle(titleId);
 			dialog = builder.create();
 		}
+		initializeDialog();
+		onDialogCreated(dialog);
+		dialog.show();
+	}
+
+	private void initializeDialog() {
 		dialog.setOnDismissListener(new OnDismissListener() {
 			@Override
 			public void onDismiss(DialogInterface dialog) {
@@ -117,8 +123,7 @@ public class ActivityDialog extends ActivityWidget {
 				onCancelDialog();
 			}
 		});
-		onDialogCreated(dialog);
-		dialog.show();
+		view.setDialog(dialog);
 	}
 
 	protected void onDialogCreated(Dialog dialog2) {

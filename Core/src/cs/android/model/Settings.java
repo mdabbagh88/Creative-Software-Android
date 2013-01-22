@@ -14,7 +14,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import cs.android.lang.CSAsyncTask;
 import cs.android.viewbase.ContextPresenter;
 import cs.java.collections.List;
 import cs.java.collections.MapItem;
@@ -37,31 +36,12 @@ public class Settings extends ContextPresenter {
 	private final SharedPreferences preferences;
 	private final String _name;
 
-	public Settings() {
-		this("settings");
-	}
-
-	public String name() {
-		return _name;
-	}
-
 	public static final String SETTING_USERNAME = "username";
+
 	public static final String SETTING_PASSWORD = "password";
 
-	public void clearCredentials() {
-		clear(SETTING_USERNAME);
-		clear(SETTING_PASSWORD);
-	}
-
-	public Credentials loadCredentials() {
-		String username = loadString(SETTING_USERNAME);
-		String password = loadString(SETTING_PASSWORD);
-		if (is(username, password)) return new CredentialsImpl(username, password);
-		return null;
-	}
-
-	public void save(Credentials credentials) {
-		save(SETTING_USERNAME, credentials.getUsername(), SETTING_PASSWORD, credentials.getPassword());
+	public Settings() {
+		this("settings");
 	}
 
 	public Settings(String name) {
@@ -77,6 +57,11 @@ public class Settings extends ContextPresenter {
 		Editor editor = preferences.edit();
 		editor.remove(key);
 		save(editor);
+	}
+
+	public void clearCredentials() {
+		clear(SETTING_USERNAME);
+		clear(SETTING_PASSWORD);
 	}
 
 	protected SharedPreferences getPreferences(String key) {
@@ -109,6 +94,13 @@ public class Settings extends ContextPresenter {
 		return preferences.getBoolean(key, defaultValue);
 	}
 
+	public Credentials loadCredentials() {
+		String username = loadString(SETTING_USERNAME);
+		String password = loadString(SETTING_PASSWORD);
+		if (is(username, password)) return new CredentialsImpl(username, password);
+		return null;
+	}
+
 	public Integer loadInteger(String key) {
 		return preferences.getInt(key, 0);
 
@@ -134,14 +126,18 @@ public class Settings extends ContextPresenter {
 		return preferences.getString(key, null);
 	}
 
+	public String name() {
+		return _name;
+	}
+
+	public void save(Credentials credentials) {
+		save(SETTING_USERNAME, credentials.getUsername(), SETTING_PASSWORD, credentials.getPassword());
+	}
+
 	private void save(final Editor editor) {
 		if (respondsTo(editor, "apply"))
 			invoke(editor, "apply");
-		else new CSAsyncTask() {
-			@Override public void run() {
-				editor.commit();
-			}
-		};
+		else editor.commit();
 	}
 
 	protected void save(String... keysvalues) {

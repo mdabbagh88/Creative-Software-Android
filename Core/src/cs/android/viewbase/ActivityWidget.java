@@ -8,6 +8,8 @@ import static cs.java.lang.Lang.no;
 import static cs.java.lang.Lang.set;
 import static cs.java.lang.Lang.unexpected;
 import android.app.Activity;
+import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -40,10 +42,15 @@ public abstract class ActivityWidget extends Widget<View> implements IActivityWi
 	private int viewId;
 	private LayoutId layoutId;
 	public static ActivityWidget root;
+	private Dialog _dialog;
 
 	public ActivityWidget(IActivityWidget parent) {
 		this.parent = parent;
 		listenParent();
+	}
+
+	public void setDialog(Dialog dialog) {
+		_dialog = dialog;
 	}
 
 	public ActivityWidget(IActivityWidget parent, int viewId) {
@@ -64,8 +71,7 @@ public abstract class ActivityWidget extends Widget<View> implements IActivityWi
 		listenParent();
 	}
 
-	@Override
-	public Activity activity() {
+	@Override public Activity activity() {
 		return activity;
 	}
 
@@ -81,48 +87,39 @@ public abstract class ActivityWidget extends Widget<View> implements IActivityWi
 		return getView();
 	}
 
-	@Override
-	public Event<ActivityResult> getOnActivityResult() {
+	@Override public Event<ActivityResult> getOnActivityResult() {
 		return eventActivityResult;
 	}
 
-	@Override
-	public Event<Value<Boolean>> getOnBack() {
+	@Override public Event<Value<Boolean>> getOnBack() {
 		return onBack;
 	}
 
-	@Override
-	public Event<Bundle> getOnCreate() {
+	@Override public Event<Bundle> getOnCreate() {
 		return eventCreate;
 	}
 
-	@Override
-	public Event<Void> getOnDestroy() {
+	@Override public Event<Void> getOnDestroy() {
 		return eventDestroy;
 	}
 
-	@Override
-	public Event<Void> getOnPause() {
+	@Override public Event<Void> getOnPause() {
 		return eventPause;
 	}
 
-	@Override
-	public Event<Void> getOnResume() {
+	@Override public Event<Void> getOnResume() {
 		return eventResume;
 	}
 
-	@Override
-	public Event<Bundle> getOnSaveInstance() {
+	@Override public Event<Bundle> getOnSaveInstance() {
 		return eventSaveInstance;
 	}
 
-	@Override
-	public Event<Void> getOnStart() {
+	@Override public Event<Void> getOnStart() {
 		return eventStart;
 	}
 
-	@Override
-	public Event<Void> getOnStop() {
+	@Override public Event<Void> getOnStop() {
 		return eventStop;
 	}
 
@@ -134,6 +131,11 @@ public abstract class ActivityWidget extends Widget<View> implements IActivityWi
 		return viewId;
 	}
 
+	@Override public Context context() {
+		if (is(parent)) return parent.context();
+		return super.context();
+	}
+
 	public boolean isCreated() {
 		return created;
 	}
@@ -142,23 +144,19 @@ public abstract class ActivityWidget extends Widget<View> implements IActivityWi
 		return destroyed;
 	}
 
-	@Override
-	public boolean isPaused() {
+	@Override public boolean isPaused() {
 		return paused;
 	}
 
-	@Override
-	public boolean isResumed() {
+	@Override public boolean isResumed() {
 		return resumed;
 	}
 
-	@Override
-	public void onBackPressed(Value<Boolean> goBack) {
+	@Override public void onBackPressed(Value<Boolean> goBack) {
 		fire(onBack, goBack);
 	}
 
-	@Override
-	public void onDeinitialize(Bundle state) {
+	@Override public void onDeinitialize(Bundle state) {
 		onPause();
 		onSaveInstanceState(state);
 		onStop();
@@ -166,8 +164,7 @@ public abstract class ActivityWidget extends Widget<View> implements IActivityWi
 		parentEventsTask.cancel();
 	}
 
-	@Override
-	public void onInitialize(Bundle state) {
+	@Override public void onInitialize(Bundle state) {
 		onCreate(state);
 		onStart();
 		onResume();
@@ -191,8 +188,12 @@ public abstract class ActivityWidget extends Widget<View> implements IActivityWi
 		}
 	}
 
-	protected void goBack() {
-		activity().onBackPressed();
+	public void goBack() {
+		if (is(_dialog))
+			_dialog.onBackPressed();
+		else if (is(parent))
+			parent.goBack();
+		else activity().onBackPressed();
 	}
 
 	protected boolean isFirstTime() {
@@ -318,8 +319,7 @@ public abstract class ActivityWidget extends Widget<View> implements IActivityWi
 			parentEventsTask = new Task(parent.getOnCreate(), parent.getOnStart(), parent.getOnResume(),
 					parent.getOnPause(), parent.getOnStop(), parent.getOnSaveInstance(),
 					parent.getOnDestroy(), parent.getOnBack(), parent.getOnActivityResult()) {
-				@Override
-				@SuppressWarnings("unchecked") public void run() {
+				@Override @SuppressWarnings("unchecked") public void run() {
 					if (event == parent.getOnCreate()) onCreate((Bundle) argument);
 					if (event == parent.getOnStart()) onStart();
 					if (event == parent.getOnResume()) onResume();

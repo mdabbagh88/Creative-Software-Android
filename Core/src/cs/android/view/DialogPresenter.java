@@ -2,9 +2,11 @@ package cs.android.view;
 
 import static cs.java.lang.Lang.is;
 import static cs.java.lang.Lang.set;
+import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnDismissListener;
 import android.os.Bundle;
 import android.view.View;
@@ -27,6 +29,28 @@ public class DialogPresenter extends ActivityWidget {
 
 	public DialogPresenter(IActivityWidget hasActivity) {
 		super(hasActivity);
+	}
+
+	public static DialogPresenter create(final ActivityWidget view, final int title, final int message,
+			final int dialogOk, final int dialogCancel, final Call<Integer> call) {
+		return new DialogPresenter(view) {
+			protected android.app.Dialog createDialog() {
+				AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context());
+				if (set(title)) alertDialogBuilder.setTitle(title);
+				if (set(message)) alertDialogBuilder.setMessage(message);
+				alertDialogBuilder.setPositiveButton(dialogOk, new OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						call.onCall(dialogOk);
+					}
+				});
+				alertDialogBuilder.setNegativeButton(dialogCancel, new OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						call.onCall(dialogCancel);
+					}
+				});
+				return alertDialogBuilder.create();
+			};
+		};
 	}
 
 	public DialogPresenter(IActivityWidget hasActivity, int viewId) {
@@ -71,12 +95,10 @@ public class DialogPresenter extends ActivityWidget {
 	}
 
 	public void showDialog() {
-		if (isVisible) return;
 		dialog = createDialog();
 		if (is(dialogCreateListener)) dialogCreateListener.onCall(dialog);
 		dialog.setOnDismissListener(new OnDismissListener() {
-			@Override
-			public void onDismiss(DialogInterface dialog) {
+			@Override public void onDismiss(DialogInterface dialog) {
 				onDialogDismiss();
 			}
 		});
