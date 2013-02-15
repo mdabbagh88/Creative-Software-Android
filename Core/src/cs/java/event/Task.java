@@ -1,6 +1,5 @@
 package cs.java.event;
 
-import static cs.java.lang.Lang.is;
 import static cs.java.lang.Lang.list;
 import cs.android.viewbase.ActivityWidget;
 import cs.java.collections.List;
@@ -13,7 +12,6 @@ public abstract class Task implements Run, Listener {
 	protected EventRegistration registration;
 	protected List<EventRegistration> registrations = list();
 	protected Event<?> event;
-	private ActivityWidget _parent;
 
 	public Task(Event<?>... events) {
 		for (Event<?> event : events)
@@ -21,9 +19,14 @@ public abstract class Task implements Run, Listener {
 	}
 
 	public Task(ActivityWidget parent, Event<?>... events) {
-		_parent = parent;
 		for (Event<?> event : events)
 			registrations.add(event.add(this));
+		parent.getOnPause().add(new Listener() {
+			public <T> void onEvent(Event<T> event, EventRegistration r, T arg) {
+				r.cancel();
+				cancel();
+			}
+		});
 	}
 
 	public void cancel() {
@@ -36,7 +39,6 @@ public abstract class Task implements Run, Listener {
 		this.event = event;
 		this.registration = registration;
 		this.argument = argument;
-		if (is(_parent) && _parent.isPaused()) return;
 		run();
 	}
 }

@@ -74,6 +74,10 @@ public class JSONTypeImpl implements JSONType {
 		return value;
 	}
 
+	@Override public String toString() {
+		return toJSON();
+	}
+	
 	@Override
 	public String toJSON() {
 		return String.valueOf(getValue());

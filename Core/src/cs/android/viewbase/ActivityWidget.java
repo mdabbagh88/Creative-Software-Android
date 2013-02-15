@@ -7,6 +7,9 @@ import static cs.java.lang.Lang.is;
 import static cs.java.lang.Lang.no;
 import static cs.java.lang.Lang.set;
 import static cs.java.lang.Lang.unexpected;
+
+import java.io.Serializable;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -302,6 +305,13 @@ public abstract class ActivityWidget extends Widget<View> implements IActivityWi
 
 	protected void switchActivity(Class<? extends Activity> activityClass) {
 		switchActivity(new Intent(activity(), activityClass));
+	}
+
+	protected void switchActivity(Class<? extends Activity> activityClass, String key,
+			Serializable value) {
+		Intent intent = new Intent(activity(), activityClass);
+		intent.putExtra(key, value);
+		switchActivity(intent);
 	}
 
 	protected void switchActivity(Class<? extends Activity> activityClass, int resultCode) {

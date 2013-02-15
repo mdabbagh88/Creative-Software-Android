@@ -123,7 +123,22 @@ public class Lang {
 	}
 
 	public static boolean empty(Object object) {
-		return size(object) == 0;
+		if (object == null) return Yes;
+		if (object instanceof Number) return ((Number) object).floatValue() == 0;
+		if (object instanceof Boolean) return !((Boolean) object).booleanValue();
+		if (object instanceof CharSequence) return ((CharSequence) object).length() == 0;
+		if (object instanceof Collection) return ((Collection<?>) object).size() == 0;
+		if (object instanceof HasValue<?>) return empty(((HasValue<?>) object).get());
+		if (object instanceof Map) return ((Map<?, ?>) object).size() == 0;
+		if (object instanceof Object[]) return ((Object[]) object).length == 0;
+		if (object instanceof int[]) return ((int[]) object).length == 0;
+		if (object instanceof double[]) return ((double[]) object).length == 0;
+		if (object instanceof long[]) return ((long[]) object).length == 0;
+		if (object instanceof char[]) return ((char[]) object).length == 0;
+		if (object instanceof float[]) return ((float[]) object).length == 0;
+		if (object instanceof boolean[]) return ((boolean[]) object).length == 0;
+		if (object instanceof byte[]) return ((byte[]) object).length == 0;
+		return No;
 	}
 
 	public static boolean equal(Object obj1, Object obj2) {
@@ -163,6 +178,10 @@ public class Lang {
 
 	public static void fire(Event<Void> eventVoid) {
 		eventVoid.run(null);
+	}
+
+	public static void fire(Run eventVoid) {
+		if (is(eventVoid)) eventVoid.run();
 	}
 
 	public static boolean has(List<?> list, Object... contents) {
@@ -369,26 +388,6 @@ public class Lang {
 
 	public static boolean set(Object value) {
 		return !empty(value);
-	}
-
-	// Should be optimized for types
-	public static int size(Object object) {
-		if (object == null) return 0;
-		if (object instanceof Number) return ((Number) object).intValue();
-		if (object instanceof Boolean) return (Boolean) object ? 1 : 0;
-		if (object instanceof CharSequence) return ((CharSequence) object).length();
-		if (object instanceof Collection) return size(((Collection<?>) object).size());
-		if (object instanceof HasValue<?>) return size(((HasValue<?>) object).get());
-		if (object instanceof Map) return ((Map<?, ?>) object).size();
-		if (object instanceof Object[]) return ((Object[]) object).length;
-		if (object instanceof int[]) return ((int[]) object).length;
-		if (object instanceof double[]) return ((double[]) object).length;
-		if (object instanceof long[]) return ((long[]) object).length;
-		if (object instanceof char[]) return ((char[]) object).length;
-		if (object instanceof float[]) return ((float[]) object).length;
-		if (object instanceof boolean[]) return ((boolean[]) object).length;
-		if (object instanceof byte[]) return ((byte[]) object).length;
-		return 1;
 	}
 
 	public static String string(String separator, Object... values) {
