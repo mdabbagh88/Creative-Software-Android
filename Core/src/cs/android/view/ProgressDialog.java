@@ -5,15 +5,15 @@ import static cs.java.lang.Lang.no;
 import android.app.Dialog;
 import cs.android.IActivityWidget;
 import cs.android.R;
-import cs.android.lang.ServerRequest;
 import cs.android.rpc.OnDone;
-import cs.android.viewbase.ActivityWidget;
+import cs.android.rpc.Response;
+import cs.android.viewbase.ViewController;
 
-public class ProgressDialog extends ActivityWidget {
+public class ProgressDialog extends ViewController {
 
 	private Dialog progressDialog;
-	private ServerRequest request;
-	private OnDone<ServerRequest> onDone;
+	private Response<?> request;
+	private OnDone<?> onDone;
 
 	public ProgressDialog(IActivityWidget parent) {
 		super(parent);
@@ -26,7 +26,7 @@ public class ProgressDialog extends ActivityWidget {
 		}
 	}
 
-	public void setRequest(ServerRequest request) {
+	public void setRequest(Response<?> request) {
 		this.request = request;
 		update();
 	}
@@ -37,16 +37,6 @@ public class ProgressDialog extends ActivityWidget {
 		progressDialog.setCancelable(false);
 		progressDialog.setContentView(R.layout.load_indicator_dialog);
 		progressDialog.show();
-	}
-
-	@Override protected void onPause() {
-		super.onPause();
-		hideProgress();
-	}
-
-	@Override protected void onResume() {
-		super.onResume();
-		update();
 	}
 
 	private void onRequestDone() {
@@ -62,12 +52,21 @@ public class ProgressDialog extends ActivityWidget {
 		else {
 			if (no(progressDialog)) showProgress();
 			if (is(onDone)) onDone.cancel();
-			onDone = new OnDone<ServerRequest>(this, request) {
-				@Override
+			onDone = new OnDone(this, request) {
 				public void run() {
 					onRequestDone();
 				}
 			};
 		}
+	}
+
+	@Override protected void onPause() {
+		super.onPause();
+		hideProgress();
+	}
+
+	@Override protected void onResume() {
+		super.onResume();
+		update();
 	}
 }

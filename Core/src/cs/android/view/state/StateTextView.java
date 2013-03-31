@@ -1,9 +1,9 @@
 package cs.android.view.state;
 
 import cs.android.IActivityWidget;
-import cs.android.viewbase.ActivityWidget;
+import cs.android.viewbase.ViewController;
 
-public class StateTextView extends ActivityWidget {
+public class StateTextView extends ViewController {
 
 	private final int viewId;
 	private String textValue = "";

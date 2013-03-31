@@ -1,31 +1,36 @@
 package cs.android.rpc;
 
 import cs.android.IActivityWidget;
-import cs.android.lang.ServerRequest;
 import cs.java.event.Event;
 import cs.java.event.Event.EventRegistration;
 import cs.java.event.Listener;
 import cs.java.lang.Run;
 
-public abstract class OnRequestEventBase<RequestType extends ServerRequest> implements Run,
-		Listener {
+public abstract class OnResponseBase<Data> implements Run, Listener {
 
-	protected final IActivityWidget onRequestParent;
-	protected final RequestType request;
+	private final IActivityWidget onRequestParent;
+	private Response<Data> response;
 	private EventRegistration registration;
 
-	public OnRequestEventBase(IActivityWidget parent, RequestType request) {
+	public OnResponseBase(IActivityWidget parent, Response<Data> response) {
 		onRequestParent = parent;
-		this.request = request;
+		this.response = response;
 	}
 
 	public void cancel() {
 		registration.cancel();
 	}
 
-	 @Override
-	public <T> void onEvent(Event<T> event, EventRegistration registration, T argument) {
+	public Data data() {
+		return response.data();
+	}
+
+	@Override public <T> void onEvent(Event<T> event, EventRegistration registration, T argument) {
 		if (onRequestParent == null || !onRequestParent.isPaused()) run();
+	}
+
+	public Response<Data> response() {
+		return response;
 	}
 
 	protected void initiazlize(EventRegistration registration) {

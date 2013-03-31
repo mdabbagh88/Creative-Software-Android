@@ -6,10 +6,10 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import cs.android.IActivityWidget;
-import cs.android.viewbase.ActivityWidget;
+import cs.android.viewbase.ViewController;
 import cs.android.viewbase.IsView;
 
-public class ViewDialog extends ActivityWidget {
+public class ViewDialog extends ViewController {
 
 	private Dialog dialog;
 

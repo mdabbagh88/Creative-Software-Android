@@ -15,7 +15,7 @@ import cs.java.collections.Map;
 import cs.java.event.Event;
 import cs.java.lang.Value;
 
-public abstract class ScreenHostViewBase extends ActivityWidget implements ScreenHostView {
+public abstract class ScreenHostViewBase extends ViewController implements ScreenHostView {
 
 	private final Event<String> onViewChange = event();
 	private final AnimatorActivityViewer viewer = new AnimatorActivityViewer(this, getAnimatorId());
@@ -104,7 +104,7 @@ public abstract class ScreenHostViewBase extends ActivityWidget implements Scree
 		fire(onViewChange, screenId);
 	}
 
-	private ActivityWidget createView(String screenId) {
+	private ViewController createView(String screenId) {
 		currentScreenId = screenId;
 		ScreenFactory screenView = screenFactories.value(screenId);
 		return screenView.createView(this, screenId);

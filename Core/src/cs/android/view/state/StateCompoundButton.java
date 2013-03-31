@@ -1,9 +1,9 @@
 package cs.android.view.state;
 
 import cs.android.IActivityWidget;
-import cs.android.viewbase.ActivityWidget;
+import cs.android.viewbase.ViewController;
 
-public class StateCompoundButton extends ActivityWidget {
+public class StateCompoundButton extends ViewController {
 
 	private final int viewId;
 	private boolean isChecked;

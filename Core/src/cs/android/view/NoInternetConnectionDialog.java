@@ -8,9 +8,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
-import cs.android.viewbase.ActivityWidget;
+import cs.android.viewbase.ViewController;
 
-public class NoInternetConnectionDialog extends ActivityWidget {
+public class NoInternetConnectionDialog extends ViewController {
 
 	private Dialog dialog;
 	private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -19,7 +19,7 @@ public class NoInternetConnectionDialog extends ActivityWidget {
 		}
 	};
 
-	public NoInternetConnectionDialog(ActivityWidget parent) {
+	public NoInternetConnectionDialog(ViewController parent) {
 		super(parent);
 	}
 

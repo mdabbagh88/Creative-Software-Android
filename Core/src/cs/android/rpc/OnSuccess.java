@@ -1,17 +1,17 @@
 package cs.android.rpc;
 
+import static cs.java.lang.Lang.no;
 import cs.android.IActivityWidget;
-import cs.android.lang.ServerRequest;
 
-public abstract class OnSuccess<RequestType extends ServerRequest> extends
-		OnRequestEventBase<RequestType> {
+public abstract class OnSuccess<Data> extends OnResponseBase<Data> {
 
-	public OnSuccess(IActivityWidget parent, RequestType request) {
+	public OnSuccess(IActivityWidget parent, Response<Data> request) {
 		super(parent, request);
+		if (no(request)) return;
 		initiazlize(request.getOnSuccess().add(this));
 	}
 
-	public OnSuccess(RequestType request) {
+	public OnSuccess(Response<Data> request) {
 		this(null, request);
 	}
 

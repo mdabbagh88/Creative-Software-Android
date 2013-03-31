@@ -23,7 +23,7 @@ import cs.java.event.Event;
 import cs.java.event.Task;
 import cs.java.lang.Value;
 
-public abstract class ActivityWidget extends Widget<View> implements IActivityWidget {
+public abstract class ViewController extends Widget<View> implements IActivityWidget {
 
 	protected Activity activity;
 	private Bundle state;
@@ -44,10 +44,10 @@ public abstract class ActivityWidget extends Widget<View> implements IActivityWi
 	protected IActivityWidget parent;
 	private int viewId;
 	private LayoutId layoutId;
-	public static ActivityWidget root;
+	public static ViewController root;
 	private Dialog _dialog;
 
-	public ActivityWidget(IActivityWidget parent) {
+	public ViewController(IActivityWidget parent) {
 		this.parent = parent;
 		listenParent();
 	}
@@ -56,19 +56,19 @@ public abstract class ActivityWidget extends Widget<View> implements IActivityWi
 		_dialog = dialog;
 	}
 
-	public ActivityWidget(IActivityWidget parent, int viewId) {
+	public ViewController(IActivityWidget parent, int viewId) {
 		this.parent = parent;
 		this.viewId = viewId;
 		listenParent();
 	}
 
-	public ActivityWidget(IActivityWidget parent, LayoutId id) {
+	public ViewController(IActivityWidget parent, LayoutId id) {
 		this.parent = parent;
 		layoutId = id;
 		listenParent();
 	}
 
-	public ActivityWidget(LayoutId layoutId) {
+	public ViewController(LayoutId layoutId) {
 		this.layoutId = layoutId;
 		root = this;
 		listenParent();

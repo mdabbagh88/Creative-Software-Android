@@ -12,7 +12,7 @@ import cs.java.lang.Value;
 public abstract class MapActivityBase extends MapActivity implements IsActivityBase {
 
 	private final ActivityManager manager = new ActivityManager(this);
-	private ActivityWidget presenter;
+	private ViewController presenter;
 
 	public void activityOnBackPressed() {
 		super.onBackPressed();
@@ -28,7 +28,7 @@ public abstract class MapActivityBase extends MapActivity implements IsActivityB
 	}
 
 	 @Override
-	public ActivityWidget getPresenter() {
+	public ViewController getPresenter() {
 		return presenter;
 	}
 

@@ -12,11 +12,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import cs.android.IActivityWidget;
-import cs.android.viewbase.ActivityWidget;
+import cs.android.viewbase.ViewController;
 import cs.java.lang.Call;
 import cs.java.lang.Factory;
 
-public class DialogPresenter extends ActivityWidget {
+public class DialogPresenter extends ViewController {
 
 	private Dialog dialog;
 	private Call<Dialog> dialogCreateListener;
@@ -31,7 +31,7 @@ public class DialogPresenter extends ActivityWidget {
 		super(hasActivity);
 	}
 
-	public static DialogPresenter create(final ActivityWidget view, final int title, final int message,
+	public static DialogPresenter create(final ViewController view, final int title, final int message,
 			final int dialogOk, final int dialogCancel, final Call<Integer> call) {
 		return new DialogPresenter(view) {
 			protected android.app.Dialog createDialog() {

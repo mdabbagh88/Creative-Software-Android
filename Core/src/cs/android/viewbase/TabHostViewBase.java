@@ -13,7 +13,7 @@ import cs.android.view.OnClick;
 import cs.java.collections.List;
 import cs.java.event.Event;
 
-public class TabHostViewBase extends ActivityWidget implements TabHostView {
+public class TabHostViewBase extends ViewController implements TabHostView {
 
 	private class Tab {
 
@@ -127,7 +127,7 @@ public class TabHostViewBase extends ActivityWidget implements TabHostView {
 		displayView(index);
 	}
 
-	private ActivityWidget createCurrentView(int index) {
+	private ViewController createCurrentView(int index) {
 		TabViewFactory tabView = tabs.get(index).screen;
 		return tabView.createView(this, index);
 	}

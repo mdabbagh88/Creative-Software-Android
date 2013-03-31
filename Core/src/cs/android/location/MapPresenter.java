@@ -9,9 +9,9 @@ import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapView;
 
 import cs.android.IActivityWidget;
-import cs.android.viewbase.ActivityWidget;
+import cs.android.viewbase.ViewController;
 
-public class MapPresenter extends ActivityWidget {
+public class MapPresenter extends ViewController {
 
 	private final int mapFrameId;
 	private final HasMap hasMap;

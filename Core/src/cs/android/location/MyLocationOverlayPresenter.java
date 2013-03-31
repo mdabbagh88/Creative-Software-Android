@@ -6,10 +6,10 @@ import com.google.android.maps.MapView;
 import com.google.android.maps.MyLocationOverlay;
 
 import cs.android.IActivityWidget;
-import cs.android.viewbase.ActivityWidget;
+import cs.android.viewbase.ViewController;
 import cs.java.lang.Run;
 
-public class MyLocationOverlayPresenter extends ActivityWidget {
+public class MyLocationOverlayPresenter extends ViewController {
 
 	private MyLocationOverlay myLocationOverLay;
 	private final HasMap hasMap;

@@ -7,13 +7,13 @@ import static cs.java.lang.Lang.no;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
-import cs.android.viewbase.ActivityWidget;
+import cs.android.viewbase.ViewController;
 import cs.android.viewbase.Widget;
 import cs.java.collections.List;
 import cs.java.event.Event;
 import cs.java.event.Job;
 
-public class LoadNextListAdapter extends ActivityWidget {
+public class LoadNextListAdapter extends ViewController {
 
 	public class EndlessScrollListener implements OnScrollListener {
 		private int visibleThreshold = 3;

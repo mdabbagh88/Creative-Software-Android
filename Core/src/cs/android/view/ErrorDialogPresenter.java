@@ -9,10 +9,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import cs.android.IActivityWidget;
 import cs.android.lang.AndroidLang;
-import cs.android.viewbase.ActivityWidget;
+import cs.android.viewbase.ViewController;
 import cs.java.lang.Factory;
 
-public class ErrorDialogPresenter extends ActivityWidget implements Factory<Dialog> {
+public class ErrorDialogPresenter extends ViewController implements Factory<Dialog> {
 
 	private final DialogPresenter errorDialogPresenter = new DialogPresenter(this);
 	private int dialogTitleId;

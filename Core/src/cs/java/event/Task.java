@@ -1,7 +1,7 @@
 package cs.java.event;
 
 import static cs.java.lang.Lang.list;
-import cs.android.viewbase.ActivityWidget;
+import cs.android.viewbase.ViewController;
 import cs.java.collections.List;
 import cs.java.event.Event.EventRegistration;
 import cs.java.lang.Run;
@@ -18,7 +18,7 @@ public abstract class Task implements Run, Listener {
 			registrations.add(event.add(this));
 	}
 
-	public Task(ActivityWidget parent, Event<?>... events) {
+	public Task(ViewController parent, Event<?>... events) {
 		for (Event<?> event : events)
 			registrations.add(event.add(this));
 		parent.getOnPause().add(new Listener() {

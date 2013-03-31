@@ -13,8 +13,8 @@ public class ActivityManager {
 		this.activityBase = activityBase;
 	}
 
-	public ActivityWidget create() {
-		ActivityWidget presenter = (ActivityWidget) activityBase.activity()
+	public ViewController create() {
+		ViewController presenter = (ViewController) activityBase.activity()
 				.getLastNonConfigurationInstance();
 		if (no(presenter)) return activityBase.create();
 		return presenter;
@@ -33,7 +33,7 @@ public class ActivityManager {
 		System.gc();
 	}
 
-	private ActivityWidget getPresenter() {
+	private ViewController getPresenter() {
 		return activityBase.getPresenter();
 	}
 

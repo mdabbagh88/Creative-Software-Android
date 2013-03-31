@@ -8,10 +8,10 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnDismissListener;
 import cs.android.IActivityWidget;
-import cs.android.viewbase.ActivityWidget;
+import cs.android.viewbase.ViewController;
 import cs.java.lang.Value;
 
-public class ActivityDialog extends ActivityWidget {
+public class ActivityDialog extends ViewController {
 
 	private Dialog dialog;
 	private IActivityWidget view;

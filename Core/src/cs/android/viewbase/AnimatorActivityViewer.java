@@ -4,9 +4,9 @@ import android.widget.ViewAnimator;
 import cs.android.IActivityWidget;
 import cs.android.R;
 
-public class AnimatorActivityViewer extends ActivityWidget {
+public class AnimatorActivityViewer extends ViewController {
 
-	private ActivityWidget currentView;
+	private ViewController currentView;
 	private final int viewAnimatorId;
 	private int backOut = R.anim.center_to_right;
 	private int backIn = R.anim.left_to_center;
@@ -18,7 +18,7 @@ public class AnimatorActivityViewer extends ActivityWidget {
 		this.viewAnimatorId = viewAnimatorId;
 	}
 
-	public void displayView(ActivityWidget view, boolean isNext) {
+	public void displayView(ViewController view, boolean isNext) {
 		if (isNext)
 			setNextAnimation();
 		else setBackAnimation();
@@ -33,7 +33,7 @@ public class AnimatorActivityViewer extends ActivityWidget {
 		return getViewAnimator(viewAnimatorId);
 	}
 
-	public ActivityWidget getCurrentView() {
+	public ViewController getCurrentView() {
 		return currentView;
 	}
 
@@ -42,7 +42,7 @@ public class AnimatorActivityViewer extends ActivityWidget {
 		this.backIn = backIn;
 	}
 
-	public void setCurrentView(ActivityWidget view) {
+	public void setCurrentView(ViewController view) {
 		currentView = view;
 		getAnimator().addView(currentView.asView());
 	}

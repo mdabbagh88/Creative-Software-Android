@@ -11,11 +11,11 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import cs.android.IActivityWidget;
-import cs.android.viewbase.ActivityWidget;
+import cs.android.viewbase.ViewController;
 import cs.java.collections.List;
 import cs.java.event.Event;
 
-public class DataListPresenter<RowType> extends ActivityWidget {
+public class DataListPresenter<RowType> extends ViewController {
 	private class ListAdapter extends BaseAdapter {
 
 		@Override public int getCount() {

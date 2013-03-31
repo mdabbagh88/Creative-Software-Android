@@ -2,9 +2,9 @@ package cs.android;
 
 import static cs.java.lang.Lang.is;
 import android.media.MediaPlayer;
-import cs.android.viewbase.ActivityWidget;
+import cs.android.viewbase.ViewController;
 
-public class CSMediaPlayer extends ActivityWidget {
+public class CSMediaPlayer extends ViewController {
 
 	private int resource;
 	private MediaPlayer mediaPlayer;

@@ -13,7 +13,7 @@ import cs.java.lang.Value;
 public abstract class ActivityBase extends Activity implements IsActivityBase {
 
 	private ActivityManager manager;
-	private ActivityWidget presenter;
+	private ViewController presenter;
 
 	@Override
 	public Activity activity() {
@@ -45,7 +45,7 @@ public abstract class ActivityBase extends Activity implements IsActivityBase {
 	}
 
 	@Override
-	public ActivityWidget getPresenter() {
+	public ViewController getPresenter() {
 		return presenter;
 	}
 
