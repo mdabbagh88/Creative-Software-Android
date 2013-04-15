@@ -1,5 +1,6 @@
 package cs.java.json;
 
+import static cs.java.lang.Lang.asDouble;
 import static cs.java.lang.Lang.is;
 import static cs.java.lang.Lang.json;
 import static cs.java.lang.Lang.list;
@@ -11,6 +12,10 @@ import cs.java.collections.List;
 
 public abstract class JSONDataBase implements JSONData {
 	protected JSONObject data = json().createObject();;
+
+	public JSONObject data() {
+		return data;
+	}
 
 	public JSONArray getArray(String key) {
 		return data.getArray(key);
@@ -24,24 +29,12 @@ public abstract class JSONDataBase implements JSONData {
 		return data.getBoolean(key);
 	}
 
-	public <T extends JSONData> void put(String key, List<T> value) {
-		data.put(key, json().create(value));
-	}
-
-	public <T extends JSONData> void put(String key, Map<String, T> value) {
-		data.put(key, json().createJSONDataMap(value));
-	}
-
-	public <T extends JSONData> void putStringMap(String key, Map<String, String> value) {
-		data.put(key, json().create(value));
+	public Double getDouble(String key) {
+		return data.getDouble(key);
 	}
 
 	public Integer getInteger(String key) {
 		return data.getInteger(key);
-	}
-
-	public Double getDouble(String key) {
-		return data.getDouble(key);
 	}
 
 	public String getNumberString(String key) {
@@ -56,11 +49,39 @@ public abstract class JSONDataBase implements JSONData {
 		return data.getString(key);
 	}
 
-	@Override
-	public void load(JSONObject data) {
+	@Override public void load(JSONObject data) {
 		if (no(data)) return;
 		this.data = data;
 		onLoad(data);
+	}
+
+	public void loadStrings(List<String> list, JSONObject data, String id) {
+		if (data.contains(id)) for (JSONType type : data.getArray(id))
+			list.add(type.asString());
+	}
+
+	public List<String> loadStrings(String id) {
+		if (!data.contains(id)) return null;
+		List<String> stringlist = list();
+		loadStrings(stringlist, data, id);
+		return stringlist;
+	}
+
+	public <T extends JSONData> void put(String key, List<T> value) {
+		data.put(key, json().create(value));
+	}
+
+	public <T extends JSONData> void put(String key, Map<String, T> value) {
+		data.put(key, json().createJSONDataMap(value));
+	}
+
+	public <T extends JSONData> void putStringMap(String key, Map<String, String> value) {
+		data.put(key, json().create(value));
+	}
+
+	@Override public final JSONObject save() {
+		onSave(data);
+		return data;
 	}
 
 	protected <T extends JSONData> T load(T data, JSONObject object) {
@@ -80,18 +101,6 @@ public abstract class JSONDataBase implements JSONData {
 		return load(apiData, data, id);
 	}
 
-	public void loadStrings(List<String> list, JSONObject data, String id) {
-		if (data.contains(id)) for (JSONType type : data.getArray(id))
-			list.add(type.asString());
-	}
-
-	public List<String> loadStrings(String id) {
-		if (!data.contains(id)) return null;
-		List<String> stringlist = list();
-		loadStrings(stringlist, data, id);
-		return stringlist;
-	}
-
 	protected void onLoad(JSONObject data) {
 	}
 
@@ -106,14 +115,8 @@ public abstract class JSONDataBase implements JSONData {
 		data.put(string, value);
 	}
 
-	@Override
-	public final JSONObject save() {
-		onSave(data);
-		return data;
-	}
-
-	public JSONObject data() {
-		return data;
+	protected void putNumberString(String string, String value) {
+		put(string, asDouble(value));
 	}
 
 	protected void save(JSONObject object, String id, Double string) {

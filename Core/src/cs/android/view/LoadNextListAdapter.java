@@ -25,30 +25,29 @@ public class LoadNextListAdapter extends ViewController {
 			this.visibleThreshold = visibleThreshold;
 		}
 
-		@Override
-		public void onScroll(AbsListView view, int first, int visible, int total) {
+		@Override public void onScroll(AbsListView view, int first, int visible, int total) {
 			if (totalItemCount() - visible <= 0 || loading) return;
 			if (totalItemCount() - visible <= first + visibleThreshold) onLoadNext();
+			LoadNextListAdapter.this.onScroll();
 		}
 
-		@Override
-		public void onScrollStateChanged(AbsListView view, int scrollState) {
+		@Override public void onScrollStateChanged(AbsListView view, int scrollState) {
+
 		}
 	}
 
 	private final Event<Void> onLoadNext = event();
+
 	private final Widget<?> loadView;
 	private EndlessScrollListener scrollListener;
 	private boolean loading;
-
 	private List<?> _data;
 
 	public <T> LoadNextListAdapter(DataListPresenter<T> parent, int loadViewLayout) {
 		super(parent);
 		loadView = new Widget<View>(this, layout(loadViewLayout));
 		new Job<List<T>>(parent.getOnLoad()) {
-			@Override
-			public void run() {
+			@Override public void run() {
 				onListLoad(argument);
 			}
 		};
@@ -56,12 +55,6 @@ public class LoadNextListAdapter extends ViewController {
 
 	public Event<?> getOnLoadNext() {
 		return onLoadNext;
-	}
-
-	@Override protected void onResume() {
-		super.onResume();
-		updateScrollListener();
-		asListView().addFooterView(loadView.asView());
 	}
 
 	private void onListLoad(List<?> data) {
@@ -88,5 +81,14 @@ public class LoadNextListAdapter extends ViewController {
 
 	private void updateScrollListener() {
 		asListView().setOnScrollListener(scrollListener);
+	}
+
+	@Override protected void onResume() {
+		super.onResume();
+		updateScrollListener();
+		asListView().addFooterView(loadView.asView());
+	}
+
+	protected void onScroll() {
 	}
 }

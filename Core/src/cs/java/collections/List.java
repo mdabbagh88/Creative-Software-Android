@@ -1,33 +1,31 @@
 package cs.java.collections;
 
 public interface List<T> extends java.util.List<T> {
-    List<T> add(T... items);
+	List<T> add(T... items);
 
-    T at(int index);
+	T at(int index);
 
-    boolean delete(T item);
+	boolean delete(T item);
 
-    T first();
+	T first();
 
-    int getIndex(T item);
+	int getIndex(T item);
 
-    boolean hasContents();
+	boolean hasContents();
 
-    @Override
-		@Deprecated
-    int indexOf(Object arg0);
+	@Override @Deprecated int indexOf(Object arg0);
 
-    boolean isLast(T item);
-    
-    T last();
+	boolean isLast(T item);
 
-    List<T> range(int fromIndex);
+	T last();
 
-    List<T> range(int fromIndex, int toIndex);
+	int lastIndex();
 
-    @Override
-		@Deprecated
-    boolean remove(Object arg0);
+	List<T> range(int fromIndex);
 
-    T removeLast();
+	List<T> range(int fromIndex, int toIndex);
+
+	@Override @Deprecated boolean remove(Object arg0);
+
+	T removeLast();
 }

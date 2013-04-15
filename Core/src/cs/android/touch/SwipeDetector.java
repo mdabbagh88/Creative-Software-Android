@@ -13,7 +13,7 @@ public class SwipeDetector implements View.OnTouchListener {
 		BottomToTop, LeftToRight, RightToLeft, TopToBottom,
 
 	}
-	static final int MIN_DISTANCE = 100;
+	static final int MIN_DISTANCE = 70;
 	private float downX, downY, upX, upY;
 
 	private final Event<SwipeType> onSwipe = event();
@@ -45,8 +45,7 @@ public class SwipeDetector implements View.OnTouchListener {
 		info("onTopToBottomSwipe!");
 	}
 
-	@Override
-	public boolean onTouch(View v, MotionEvent event) {
+	@Override public boolean onTouch(View v, MotionEvent event) {
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN: {
 			downX = event.getX();

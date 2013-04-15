@@ -61,42 +61,14 @@ public class DataListPresenter<RowType> extends ViewController {
 		return dataList;
 	}
 
-	private int getItemsCount() {
-		return dataList.size();
-	}
-
 	public Event<List<RowType>> getOnLoad() {
 		return onLoad;
-	}
-
-	private View listAdapterGetView(int position, View view) {
-		RowView<RowType> rowView;
-		if (no(view)) {
-			rowView = viewFactory.create(position);
-			view = rowView.asView();
-			view.setTag(rowView);
-		} else rowView = (RowView<RowType>) view.getTag();
-		rowView.load(dataList.get(position));
-		return view;
 	}
 
 	public void load(List<RowType> list) {
 		dataList.addAll(list);
 		listAdapter.notifyDataSetChanged();
 		fire(onLoad, list);
-	}
-
-	@Override protected void onPause() {
-		super.onPause();
-		saveSelection();
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" }) @Override protected void onResume() {
-		super.onResume();
-		if (dataList.hasContents()) {
-			((AdapterView) asAbsListView()).setAdapter(listAdapter);
-			restoreSelection();
-		}
 	}
 
 	public void prependData(RowType status) {
@@ -133,6 +105,38 @@ public class DataListPresenter<RowType> extends ViewController {
 
 	public void setEmptyView(int layoutId) {
 		asAbsListView().setEmptyView(inflateLayout(layoutId));
+	}
+
+	private int getItemsCount() {
+		return dataList.size();
+	}
+
+	private View listAdapterGetView(int position, View view) {
+		RowView<RowType> rowView;
+		if (no(view)) {
+			rowView = viewFactory.create(position);
+			view = rowView.asView();
+			view.setTag(rowView);
+		} else rowView = (RowView<RowType>) view.getTag();
+		rowView.load(dataList.get(position));
+		onRowViewLoaded(rowView);
+		return view;
+	}
+
+	@Override protected void onPause() {
+		super.onPause();
+		saveSelection();
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" }) @Override protected void onResume() {
+		super.onResume();
+		if (dataList.hasContents()) {
+			((AdapterView) asAbsListView()).setAdapter(listAdapter);
+			restoreSelection();
+		}
+	}
+
+	protected void onRowViewLoaded(RowView<RowType> rowView) {
 	}
 
 }

@@ -1,6 +1,9 @@
 package cs.android.viewbase;
 
+import static cs.java.lang.Lang.array;
+import static cs.java.lang.Lang.empty;
 import static cs.java.lang.Lang.is;
+import static cs.java.lang.Lang.list;
 import static cs.java.lang.Lang.no;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
@@ -18,6 +21,7 @@ import android.telephony.TelephonyManager;
 import android.view.LayoutInflater;
 import cs.android.ApplicationContext;
 import cs.android.HasContext;
+import cs.java.collections.List;
 import cs.java.lang.Base;
 
 public abstract class ContextPresenter extends Base implements HasContext {
@@ -35,13 +39,7 @@ public abstract class ContextPresenter extends Base implements HasContext {
 		setContext(context.context());
 	}
 
-	public Bitmap loadBitmap(int id){
-		Drawable drawable = context().getResources().getDrawable(id);
-		return ((BitmapDrawable) drawable).getBitmap();
-	}
-	
-	@Override
-	public Context context() {
+	@Override public Context context() {
 		if (no(context)) return ApplicationContext.getContext();
 		return context;
 	}
@@ -51,10 +49,12 @@ public abstract class ContextPresenter extends Base implements HasContext {
 	}
 
 	public String getString(int id) {
+		if (empty(id)) return "";
 		return context().getResources().getString(id);
 	}
 
 	public String[] getStringArray(int id) {
+		if (empty(id)) return array();
 		return context().getResources().getStringArray(id);
 	}
 
@@ -64,8 +64,10 @@ public abstract class ContextPresenter extends Base implements HasContext {
 				&& connectivity.getActiveNetworkInfo().isConnected();
 	}
 
-	void setContext(Context context) {
-		this.context = context;
+	public Bitmap loadBitmap(int id) {
+		if (empty(id)) return null;
+		Drawable drawable = context().getResources().getDrawable(id);
+		return ((BitmapDrawable) drawable).getBitmap();
 	}
 
 	protected ConnectivityManager getConnectivity() {
@@ -93,7 +95,13 @@ public abstract class ContextPresenter extends Base implements HasContext {
 	}
 
 	protected String getString(int id, Object... args) {
+		if (empty(id)) return "";
 		return String.format(context().getResources().getString(id), args);
+	}
+
+	protected List<String> getStringList(int id) {
+		if (empty(id)) return list();
+		return list(getStringArray(id));
 	}
 
 	protected TelephonyManager getTelephony() {
@@ -120,5 +128,9 @@ public abstract class ContextPresenter extends Base implements HasContext {
 
 	protected void stopService(Intent intent) {
 		context().stopService(intent);
+	}
+
+	void setContext(Context context) {
+		this.context = context;
 	}
 }

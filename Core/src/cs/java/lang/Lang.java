@@ -44,14 +44,6 @@ public class Lang {
 			list.add(item);
 	}
 
-	public static <T> T first(T[] items) {
-		return list(items).first();
-	}
-
-	public static <T> T last(T[] items) {
-		return list(items).last();
-	}
-
 	public static void alert(String... messages) {
 		impl.alert((Object[]) messages);
 	}
@@ -74,6 +66,14 @@ public class Lang {
 		} catch (Exception e) {
 		}
 		return null;
+	}
+
+	public static double asDouble(Object value) {
+		try {
+			return Double.parseDouble(asString(value));
+		} catch (NumberFormatException e) {
+			return 0;
+		}
 	}
 
 	public static int asInt(Object value) {
@@ -102,6 +102,10 @@ public class Lang {
 
 	public static String createTraceString(Throwable ex) {
 		return impl.createTraceString(ex);
+	}
+
+	public static long currentTime() {
+		return new Date().getTime();
 	}
 
 	public static void debug(Object... values) {
@@ -184,6 +188,10 @@ public class Lang {
 		if (is(eventVoid)) eventVoid.run();
 	}
 
+	public static <T> T first(T[] items) {
+		return list(items).first();
+	}
+
 	public static boolean has(List<?> list, Object... contents) {
 		return has(list.toArray(), contents);
 	}
@@ -214,12 +222,36 @@ public class Lang {
 		impl.info(values);
 	}
 
-	public static void warn(Object... values) {
-		impl.warn(values);
-	}
-
 	public static void initialize(LangCore impl) {
 		Lang.impl = impl;
+	}
+
+	public static boolean is(boolean object) {
+		return set(object);
+	}
+
+	public static boolean is(byte object) {
+		return set(object);
+	}
+
+	public static boolean is(char object) {
+		return set(object);
+	}
+
+	public static boolean is(double object) {
+		return set(object);
+	}
+
+	public static boolean is(float object) {
+		return set(object);
+	}
+
+	public static boolean is(int object) {
+		return set(object);
+	}
+
+	public static boolean is(long object) {
+		return set(object);
 	}
 
 	public static boolean is(Object item) {
@@ -249,12 +281,12 @@ public class Lang {
 		return new ListIterator<T>(list(items));
 	}
 
-	public static <T> Iteration<T> iterate(List<T> items) {
-		return new ListIterator<T>(items);
-	}
-
 	public static <K, V> Iteration<Mapped<K, V>> iterate(java.util.Map<K, V> map) {
 		return new MapIterator<K, V>(map);
+	}
+
+	public static <T> Iteration<T> iterate(List<T> items) {
+		return new ListIterator<T>(items);
 	}
 
 	public static <T> Iteration<T> iterate(T... items) {
@@ -267,6 +299,10 @@ public class Lang {
 
 	public static JSONContainer json(String json_string) {
 		return json().parse(json_string);
+	}
+
+	public static <T> T last(T[] items) {
+		return list(items).last();
 	}
 
 	public static <K, V> LinkedHashMap<K, V> linkedmap() {
@@ -301,23 +337,7 @@ public class Lang {
 		return map;
 	}
 
-	public static boolean no(Object object) {
-		return object == null;
-	}
-
-	public static boolean no(int object) {
-		return empty(object);
-	}
-
-	public static boolean no(float object) {
-		return empty(object);
-	}
-
-	public static boolean no(double object) {
-		return empty(object);
-	}
-
-	public static boolean no(char object) {
+	public static boolean no(boolean object) {
 		return empty(object);
 	}
 
@@ -325,7 +345,19 @@ public class Lang {
 		return empty(object);
 	}
 
-	public static boolean no(boolean object) {
+	public static boolean no(char object) {
+		return empty(object);
+	}
+
+	public static boolean no(double object) {
+		return empty(object);
+	}
+
+	public static boolean no(float object) {
+		return empty(object);
+	}
+
+	public static boolean no(int object) {
 		return empty(object);
 	}
 
@@ -333,36 +365,8 @@ public class Lang {
 		return empty(object);
 	}
 
-	public static boolean is(int object) {
-		return set(object);
-	}
-
-	public static boolean is(float object) {
-		return set(object);
-	}
-
-	public static boolean is(double object) {
-		return set(object);
-	}
-
-	public static boolean is(char object) {
-		return set(object);
-	}
-
-	public static boolean is(byte object) {
-		return set(object);
-	}
-
-	public static long currentTime() {
-		return new Date().getTime();
-	}
-
-	public static boolean is(boolean object) {
-		return set(object);
-	}
-
-	public static boolean is(long object) {
-		return set(object);
+	public static boolean no(Object object) {
+		return object == null;
 	}
 
 	public static boolean no(Object... objects) {
@@ -432,6 +436,10 @@ public class Lang {
 
 	public static String urlEncode(String argument) {
 		return impl.urlEncode(argument);
+	}
+
+	public static void warn(Object... values) {
+		impl.warn(values);
 	}
 
 }

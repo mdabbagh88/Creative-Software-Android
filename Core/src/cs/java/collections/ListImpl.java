@@ -39,8 +39,16 @@ public class ListImpl<T> extends ArrayList<T> implements List<T> {
 		return size() > 0;
 	}
 
+	public boolean isLast(T item) {
+		return last() == item;
+	}
+
 	@Override public T last() {
-		return at(size() - 1);
+		return at(lastIndex());
+	}
+
+	@Override public int lastIndex() {
+		return size() - 1;
 	}
 
 	@Override public List<T> range(int fromIndex) {
@@ -51,11 +59,7 @@ public class ListImpl<T> extends ArrayList<T> implements List<T> {
 		return new ListImpl<T>(subList(fromIndex, toIndex));
 	}
 
-	@Override public T removeLast() {
+	public T removeLast() {
 		return remove(size() - 1);
-	}
-
-	public boolean isLast(T item) {
-		return last() == item;
 	}
 }

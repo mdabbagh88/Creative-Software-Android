@@ -4,6 +4,10 @@ import static cs.java.lang.Lang.exception;
 import static cs.java.lang.Lang.is;
 import static cs.java.lang.Lang.no;
 import static cs.java.lang.Lang.set;
+
+import java.util.Calendar;
+import java.util.Date;
+
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -22,6 +26,7 @@ import android.view.animation.Animation.AnimationListener;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import android.widget.AbsListView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -38,12 +43,14 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.ToggleButton;
 import android.widget.ViewAnimator;
 import cs.android.HasContext;
 import cs.android.aq.CSQuery;
+import cs.java.collections.List;
 import cs.java.common.Point;
 
 public class Widget<T extends View> extends ContextPresenter implements IsView {
@@ -55,9 +62,6 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 	private View view;
 
 	private CSQuery aq;
-
-	Widget() {
-	}
 
 	public Widget(HasContext hascontext) {
 		super(hascontext);
@@ -79,7 +83,7 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 
 	public Widget(final View parent, LayoutId layoutId) {
 		super(new HasContext() {
-			@Override public Context context() {
+			public Context context() {
 				return parent.getContext();
 			}
 		});
@@ -88,6 +92,9 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 
 	public Widget(Widget<?> parent, int viewId) {
 		this(parent.getView(viewId));
+	}
+
+	Widget() {
 	}
 
 	public CSQuery aq() {
@@ -119,7 +126,7 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		return (ProgressBar) asView();
 	}
 
-	@Override @SuppressWarnings("unchecked") public T asView() {
+	@SuppressWarnings("unchecked") public T asView() {
 		return (T) view;
 	}
 
@@ -127,41 +134,58 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		return new Point(getLeft() + getWidth() / 2, getTop() + getHeight() / 2);
 	}
 
-	public void fadeIn() {
-		showView();
+	public AlphaAnimation fadeIn() {
+		return fadeIn(asView());
+	}
+
+	public AlphaAnimation fadeIn(int view) {
+		return fadeIn(getView(view));
+	}
+
+	public AlphaAnimation fadeIn(View view) {
+		show(view);
 		AlphaAnimation animation = new AlphaAnimation(0.0f, 1.0f);
 		animation.setDuration(300);
 		animation.setInterpolator(new AccelerateInterpolator());
 		animation.setAnimationListener(new AnimationListener() {
-			@Override public void onAnimationEnd(Animation animation) {
+			public void onAnimationEnd(Animation animation) {
 			}
 
-			@Override public void onAnimationRepeat(Animation animation) {
+			public void onAnimationRepeat(Animation animation) {
 			}
 
-			@Override public void onAnimationStart(Animation animation) {
+			public void onAnimationStart(Animation animation) {
 			}
 		});
-		asView().startAnimation(animation);
+		view.startAnimation(animation);
+		return animation;
 	}
 
 	public void fadeOut() {
-		if (!isVisible()) return;
+		fadeOut(asView());
+	}
+
+	public void fadeOut(int view) {
+		fadeOut(getView(view));
+	}
+
+	public void fadeOut(final View view) {
+		if (!isVisible(view)) return;
 		AlphaAnimation animation = new AlphaAnimation(1.0f, 0.0f);
 		animation.setDuration(300);
 		animation.setInterpolator(new AccelerateInterpolator());
 		animation.setAnimationListener(new AnimationListener() {
-			@Override public void onAnimationEnd(Animation animation) {
-				hideView();
+			public void onAnimationEnd(Animation animation) {
+				hide(view);
 			}
 
-			@Override public void onAnimationRepeat(Animation animation) {
+			public void onAnimationRepeat(Animation animation) {
 			}
 
-			@Override public void onAnimationStart(Animation animation) {
+			public void onAnimationStart(Animation animation) {
 			}
 		});
-		asView().startAnimation(animation);
+		view.startAnimation(animation);
 	}
 
 	public Button getButton(int id) {
@@ -356,14 +380,6 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		getImageView(imageViewId).setImageResource(imageResource);
 	}
 
-	protected void setImageViewResource(int viewId, int drawable) {
-		getImageView(viewId).setImageResource(drawable);
-	}
-
-	protected void setInflateView(int layoutId) {
-		view = inflateLayout(layoutId);
-	}
-
 	public void setInvisible() {
 		setVisibility(View.INVISIBLE);
 	}
@@ -479,6 +495,35 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		DisplayMetrics metrics = resources.getDisplayMetrics();
 		float px = dp * (metrics.densityDpi / 160f);
 		return px;
+	}
+
+	protected Date getDate(DatePicker picker) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(picker.getYear(), picker.getMonth(), picker.getDayOfMonth());
+		return calendar.getTime();
+	}
+
+	protected Date getDate(int picker) {
+		return getDate(getDatePicker(picker));
+	}
+
+	protected Spinner getSpinner(int id) {
+		return (Spinner) getView(id);
+	}
+
+	protected void setImageViewResource(int viewId, int drawable) {
+		getImageView(viewId).setImageResource(drawable);
+	}
+
+	protected void setInflateView(int layoutId) {
+		view = inflateLayout(layoutId);
+	}
+
+	protected void setSpinnerData(Spinner spinner, List<String> strings) {
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(context(),
+				android.R.layout.simple_spinner_item, strings);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		spinner.setAdapter(adapter);
 	}
 
 }

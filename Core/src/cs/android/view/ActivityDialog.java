@@ -1,6 +1,7 @@
 package cs.android.view;
 
 import static cs.java.lang.Lang.is;
+import static cs.java.lang.Lang.no;
 import static cs.java.lang.Lang.set;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
@@ -37,6 +38,10 @@ public class ActivityDialog extends ViewController {
 		if (is(view)) dissmissActivityView();
 	}
 
+	public void setDialogHideListener(DialogHideListener dialogHideListener) {
+		this.dialogHideListener = dialogHideListener;
+	}
+
 	public void setTheme(int theme) {
 		this.theme = theme;
 	}
@@ -52,23 +57,6 @@ public class ActivityDialog extends ViewController {
 		view.onInitialize(null);
 	}
 
-	@Override protected void onCreate() {
-		super.onCreate();
-		if (is(dialog)) dismissDialog();
-	}
-
-	@Override protected void onDestroy() {
-		super.onDestroy();
-		if (is(dialog)) dismissDialog();
-	}
-
-	@Override protected void onResume() {
-		super.onResume();
-		if (is(dialog))
-			dialog.show();
-		else if (is(view)) showDialog();
-	}
-
 	private void dismissDialog() {
 		dialog.dismiss();
 		dialog = null;
@@ -79,19 +67,34 @@ public class ActivityDialog extends ViewController {
 		view = null;
 	}
 
+	private void initializeDialog() {
+		dialog.setOnDismissListener(new OnDismissListener() {
+			@Override public void onDismiss(DialogInterface dialog) {
+				onDialogDismiss();
+			}
+		});
+		dialog.setOnCancelListener(new OnCancelListener() {
+			@Override public void onCancel(DialogInterface dialog) {
+				onCancelDialog();
+			}
+		});
+		view.setDialog(dialog);
+	}
+
 	private void onCancelDialog() {
 		dissmissActivityView();
 		dialog = null;
 	}
 
-	public void setDialogHideListener(DialogHideListener dialogHideListener) {
-		this.dialogHideListener = dialogHideListener;
+	private void onDialogDismiss() {
+		if (set(dialogHideListener)) dialogHideListener.onDialogHide(this);
 	}
 
 	private void showDialog() {
 		if (set(theme)) {
 			dialog = new Dialog(context(), theme) {
 				@Override public void onBackPressed() {
+					if (no(view)) super.onBackPressed();
 					Value<Boolean> goBack = new Value<Boolean>(true);
 					view.onBackPressed(goBack);
 					if (goBack.get()) super.onBackPressed();
@@ -110,27 +113,24 @@ public class ActivityDialog extends ViewController {
 		dialog.show();
 	}
 
-	private void initializeDialog() {
-		dialog.setOnDismissListener(new OnDismissListener() {
-			@Override
-			public void onDismiss(DialogInterface dialog) {
-				onDialogDismiss();
-			}
-		});
-		dialog.setOnCancelListener(new OnCancelListener() {
-			@Override
-			public void onCancel(DialogInterface dialog) {
-				onCancelDialog();
-			}
-		});
-		view.setDialog(dialog);
+	@Override protected void onCreate() {
+		super.onCreate();
+		if (is(dialog)) dismissDialog();
+	}
+
+	@Override protected void onDestroy() {
+		super.onDestroy();
+		if (is(dialog)) dismissDialog();
 	}
 
 	protected void onDialogCreated(Dialog dialog2) {
 	}
 
-	private void onDialogDismiss() {
-		if (set(dialogHideListener)) dialogHideListener.onDialogHide(this);
+	@Override protected void onResume() {
+		super.onResume();
+		if (is(dialog))
+			dialog.show();
+		else if (is(view)) showDialog();
 	}
 
 }
