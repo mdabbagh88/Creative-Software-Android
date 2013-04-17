@@ -70,6 +70,10 @@ public abstract class ContextPresenter extends Base implements HasContext {
 		return ((BitmapDrawable) drawable).getBitmap();
 	}
 
+	protected int getColor(int color) {
+		return context().getResources().getColor(color);
+	}
+
 	protected ConnectivityManager getConnectivity() {
 		return (ConnectivityManager) context().getSystemService(Context.CONNECTIVITY_SERVICE);
 	}

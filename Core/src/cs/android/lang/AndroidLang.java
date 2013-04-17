@@ -102,6 +102,23 @@ public class AndroidLang {
 		return hasactivity.activity().getResources().getDrawable(drawable);
 	}
 
+	public static Object invoke(Object object, String methodName) {
+		try {
+			return object.getClass().getMethod(methodName, (Class<?>[]) null).invoke(object);
+		} catch (Exception e) {
+			throw exception(e);
+		}
+	}
+
+	public static boolean respondsTo(Object object, String methodName) {
+		try {
+			object.getClass().getMethod(methodName, (Class<?>[]) null);
+			return Yes;
+		} catch (NoSuchMethodException e) {
+			return No;
+		}
+	}
+
 	public static void setApplication(Application aplication) {
 		AndroidLang.aplication = aplication;
 	}
@@ -137,23 +154,6 @@ public class AndroidLang {
 			reader.close();
 		} catch (IOException e) {
 			error(e);
-		}
-	}
-
-	public static Object invoke(Object object, String methodName) {
-		try {
-			return object.getClass().getMethod(methodName, (Class<?>[]) null).invoke(object);
-		} catch (Exception e) {
-			throw exception(e);
-		}
-	}
-
-	public static boolean respondsTo(Object object, String methodName) {
-		try {
-			object.getClass().getMethod(methodName, (Class<?>[]) null);
-			return Yes;
-		} catch (NoSuchMethodException e) {
-			return No;
 		}
 	}
 }
