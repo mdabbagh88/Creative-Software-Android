@@ -14,13 +14,17 @@ public interface JSONObject extends JSONContainer, Iterable<String> {
 
 	Boolean getBoolean(String key);
 
-	Number getNumber(String key);
+	Boolean getBoolean(String key, Boolean defaultValue);
 
 	Double getDouble(String key);
 
 	Integer getInteger(String key);
 
+	Integer getInteger(String key, Integer defaultValue);
+
 	Long getLong(String key);
+
+	Number getNumber(String key);
 
 	JSONObject getObject(String key);
 
@@ -28,9 +32,9 @@ public interface JSONObject extends JSONContainer, Iterable<String> {
 
 	void put(String key, Boolean value);
 
-	void put(String key, Number value);
-
 	void put(String key, JSONType value);
+
+	void put(String key, Number value);
 
 	void put(String key, String value);
 

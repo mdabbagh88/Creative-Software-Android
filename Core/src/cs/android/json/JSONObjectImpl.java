@@ -2,6 +2,7 @@ package cs.android.json;
 
 import static cs.java.lang.Lang.error;
 import static cs.java.lang.Lang.is;
+import static cs.java.lang.Lang.no;
 
 import java.util.Iterator;
 
@@ -33,6 +34,12 @@ public class JSONObjectImpl extends JsonObjectImplBase {
 		return this;
 	}
 
+	public Boolean getBoolean(String key, Boolean defaultValue) {
+		Boolean value = getBoolean(key);
+		if (no(value)) return defaultValue;
+		return defaultValue;
+	}
+
 	@Override public JSONType getImpl(String key) {
 		Object valuekey = null;
 		try {
@@ -43,18 +50,21 @@ public class JSONObjectImpl extends JsonObjectImplBase {
 		return null;
 	}
 
-	@Override
-	public int getSize() {
+	public Integer getInteger(String key, Integer defaultValue) {
+		Integer value = getInteger(key);
+		if (no(value)) return defaultValue;
+		return defaultValue;
+	}
+
+	@Override public int getSize() {
 		return value.length();
 	}
 
-	@Override
-	public Iterator<String> iterator() {
+	@Override public Iterator<String> iterator() {
 		return value.keys();
 	}
 
-	@Override
-	public void put(String key, JSONType value) {
+	@Override public void put(String key, JSONType value) {
 		try {
 			this.value.put(key, value.getValue());
 		} catch (JSONException e) {
@@ -62,8 +72,7 @@ public class JSONObjectImpl extends JsonObjectImplBase {
 		}
 	}
 
-	@Override
-	public void remove(String key) {
+	@Override public void remove(String key) {
 		value.remove(key);
 	}
 

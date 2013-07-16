@@ -6,7 +6,7 @@ import cs.android.lang.DoLater;
 import cs.android.view.NetworkReachability;
 import cs.android.viewbase.ViewController;
 
-public abstract class SuccessRequestManager extends ViewController {
+public abstract class SuccessRequestManager<T> extends ViewController {
 
 	private NetworkReachability reachability;
 
@@ -15,8 +15,7 @@ public abstract class SuccessRequestManager extends ViewController {
 	}
 
 	public void start() {
-		if (isNetworkConnected())
-			process();
+		if (isNetworkConnected()) process();
 		else reachability = new NetworkReachability() {
 			@Override protected void onNetworkConnected() {
 				new DoLater(SuccessRequestManager.this, 3 * SECOND) {
@@ -30,7 +29,7 @@ public abstract class SuccessRequestManager extends ViewController {
 	}
 
 	private void process() {
-		new OnFailed<Void>(createRequest()) {
+		new OnFailed<T>(createRequest()) {
 			public void run() {
 				new DoLater(SuccessRequestManager.this, 15 * SECOND) {
 					public void run() {
@@ -47,7 +46,7 @@ public abstract class SuccessRequestManager extends ViewController {
 		reachability = null;
 	}
 
-	protected abstract Response<Void> createRequest();
+	protected abstract Response<T> createRequest();
 
 	@Override protected void onPause() {
 		super.onPause();

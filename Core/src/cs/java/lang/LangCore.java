@@ -6,6 +6,7 @@ import cs.java.lang.Lang.Work;
 public interface LangCore {
 
 	public static final String ERROR_TITLE = "Error";
+	public static final String DEBUG_TITLE = "Debug";
 	public static final String WARN_TITLE = "Warn";
 	public static final String INFO_TITLE = "Info";
 

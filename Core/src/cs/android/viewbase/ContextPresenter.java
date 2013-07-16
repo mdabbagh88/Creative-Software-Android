@@ -2,15 +2,25 @@ package cs.android.viewbase;
 
 import static cs.java.lang.Lang.array;
 import static cs.java.lang.Lang.empty;
+import static cs.java.lang.Lang.error;
 import static cs.java.lang.Lang.is;
 import static cs.java.lang.Lang.list;
 import static cs.java.lang.Lang.no;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.app.KeyguardManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -21,12 +31,14 @@ import android.telephony.TelephonyManager;
 import android.view.LayoutInflater;
 import cs.android.ApplicationContext;
 import cs.android.HasContext;
+import cs.android.aq.CSQuery;
 import cs.java.collections.List;
 import cs.java.lang.Base;
 
 public abstract class ContextPresenter extends Base implements HasContext {
 
 	private Context context;
+	private CSQuery _aq;
 
 	public ContextPresenter() {
 	}
@@ -37,6 +49,19 @@ public abstract class ContextPresenter extends Base implements HasContext {
 
 	public ContextPresenter(HasContext context) {
 		setContext(context.context());
+	}
+
+	public PackageInfo getPackageInfo() {
+		try {
+			return context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+		} catch (NameNotFoundException e) {
+			return null;
+		}
+	}
+	
+	public CSQuery aq() {
+		if (no(_aq)) _aq = new CSQuery();
+		return _aq;
 	}
 
 	@Override public Context context() {
@@ -56,6 +81,19 @@ public abstract class ContextPresenter extends Base implements HasContext {
 	public String[] getStringArray(int id) {
 		if (empty(id)) return array();
 		return context().getResources().getStringArray(id);
+	}
+
+	public String getStringResource(int id) {
+		return getStringResource(id, "UTF-8");
+	}
+
+	public String getStringResource(int id, String encoding) {
+		try {
+			return new String(getResource(id, context()), encoding);
+		} catch (UnsupportedEncodingException e) {
+			error(e);
+			return null;
+		}
 	}
 
 	public boolean isNetworkConnected() {
@@ -92,6 +130,29 @@ public abstract class ContextPresenter extends Base implements HasContext {
 
 	protected PowerManager getPower() {
 		return (PowerManager) context().getSystemService(Context.POWER_SERVICE);
+	}
+
+	protected byte[] getResource(int id, Context context) {
+		try {
+			Resources resources = context.getResources();
+			InputStream is = resources.openRawResource(id);
+			ByteArrayOutputStream bout = new ByteArrayOutputStream();
+			byte[] readBuffer = new byte[4 * 1024];
+			try {
+				int read;
+				do {
+					read = is.read(readBuffer, 0, readBuffer.length);
+					if (read == -1) break;
+					bout.write(readBuffer, 0, read);
+				} while (true);
+				return bout.toByteArray();
+			} finally {
+				is.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	protected Object getService(String serviceName) {

@@ -3,10 +3,14 @@ package cs.android.rpc;
 import static cs.android.lang.AndroidLang.event;
 import static cs.java.lang.Lang.Yes;
 import static cs.java.lang.Lang.createTraceString;
+import static cs.java.lang.Lang.doLater;
 import static cs.java.lang.Lang.error;
 import static cs.java.lang.Lang.fire;
+import static cs.java.lang.Lang.is;
 import cs.android.viewbase.ContextPresenter;
 import cs.java.event.Event;
+import cs.java.lang.Run;
+import cs.java.net.Url;
 
 public class Response<Data> extends ContextPresenter {
 
@@ -20,13 +24,24 @@ public class Response<Data> extends ContextPresenter {
 	private boolean _failed;
 	protected Data _data;
 	private boolean _canceled;
+	private Url url;
 
 	public Response() {
 	}
 
+	public Response(Url url) {
+		this.url = url;
+	}
+
 	public void cancel() {
+		if (_canceled)
+			return;
 		_canceled = Yes;
 		onDone();
+	}
+
+	public String content() {
+		return "";
 	}
 
 	public Data data() {
@@ -37,6 +52,15 @@ public class Response<Data> extends ContextPresenter {
 		error(e);
 		_exceptionDetails = createTraceString(e);
 		failed(e.getMessage());
+	}
+
+	public void failed(final Exception e, String message) {
+		error(e);
+		_exceptionMessage = message;
+		if (is(e))
+			_exceptionDetails = createTraceString(e) + e.getMessage();
+		onFailed(this);
+		onDone();
 	}
 
 	public void failed(final String message) {
@@ -65,6 +89,8 @@ public class Response<Data> extends ContextPresenter {
 	public Event<Response<Data>> getOnDone() {
 		return _onDone;
 	}
+	
+	
 
 	public Event<Response<?>> getOnFailed() {
 		return _onFailed;
@@ -91,20 +117,41 @@ public class Response<Data> extends ContextPresenter {
 	}
 
 	public void onDone() {
+		if (_done)
+			return;
 		_done = true;
 		fire(_onDone, Response.this);
 	}
 
 	public void onFailed(Response<?> request) {
-		if (_canceled) return;
+		if (_canceled)
+			return;
+		if (_failed)
+			return;
 		_failed = true;
 		fire(_onFailed, request);
 	}
 
 	public void onSuccess() {
-		if (_canceled) return;
+		if (_canceled)
+			return;
+		if (_success)
+			return;
 		_success = Yes;
 		fire(_onSuccess, Response.this);
+	}
+
+	public String params() {
+		return "";
+	}
+
+	public void reset() {
+		_exceptionDetails = "";
+		_exceptionMessage = "";
+		_done = false;
+		_success = false;
+		_failed = false;
+		_canceled = false;
 	}
 
 	public void success(Data data) {
@@ -112,9 +159,22 @@ public class Response<Data> extends ContextPresenter {
 		success();
 	}
 
+	public Url url() {
+		return url;
+	}
+
 	protected void success() {
 		onSuccess();
 		onDone();
 	}
+	
+	public void successLater() {
+		doLater(new Run() {
+			public void run() {
+				success();
+			}
+		});
+	}
+
 
 }

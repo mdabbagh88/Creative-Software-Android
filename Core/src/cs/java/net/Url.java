@@ -3,6 +3,7 @@ package cs.java.net;
 import static cs.java.lang.Lang.asString;
 import static cs.java.lang.Lang.iterate;
 import static cs.java.lang.Lang.list;
+import static cs.java.lang.Lang.map;
 import static cs.java.lang.Lang.text;
 import static cs.java.lang.Lang.urlEncode;
 import cs.java.collections.Iteration;
@@ -22,6 +23,11 @@ public class Url {
 
 	public Url(String baseUrl) {
 		this.baseUrl = baseUrl;
+	}
+
+	public Url(String url, Object... arguments) {
+		this(url);
+		addArguments(map((Object[]) arguments));
 	}
 
 	public Url add(String argument, Object value) {

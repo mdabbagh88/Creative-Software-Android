@@ -55,6 +55,14 @@ import cs.java.common.Point;
 
 public class Widget<T extends View> extends ContextPresenter implements IsView {
 
+	public static <T extends View> Widget<T> load(View view) {
+		try {
+			return (Widget<T>) view.getTag();
+		} catch (ClassCastException e) {
+			return null;
+		}
+	}
+
 	protected static LayoutId layout(int id) {
 		return new LayoutId(id);
 	}
@@ -78,7 +86,7 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 
 	public Widget(final View view) {
 		super(view.getContext());
-		this.view = view;
+		setView(view);
 	}
 
 	public Widget(final View parent, LayoutId layoutId) {
@@ -208,11 +216,11 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		return ((WindowManager) context().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 	}
 
-	public int getDisplayHeight() {
+	@SuppressWarnings("deprecation") public int getDisplayHeight() {
 		return getDisplay().getHeight();
 	}
 
-	public int getDisplayWidth() {
+	@SuppressWarnings("deprecation") public int getDisplayWidth() {
 		return getDisplay().getWidth();
 	}
 
@@ -447,6 +455,7 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 
 	public void setView(View view) {
 		this.view = view;
+		if (is(view)) view.setTag(this);
 	}
 
 	public void setViewVisible(int viewId, boolean visible) {
@@ -516,7 +525,7 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 	}
 
 	protected void setInflateView(int layoutId) {
-		view = inflateLayout(layoutId);
+		setView(inflateLayout(layoutId));
 	}
 
 	protected void setSpinnerData(Spinner spinner, List<String> strings) {

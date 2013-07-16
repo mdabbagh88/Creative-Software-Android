@@ -21,16 +21,38 @@ import java.util.Calendar;
 import java.util.TimeZone;
 
 import android.graphics.drawable.Drawable;
+import android.view.View;
+import android.view.ViewGroup;
+import cs.android.BuildConfig;
 import cs.android.IActivityWidget;
+import cs.java.collections.GenericIterator;
+import cs.java.collections.Iteration;
 import cs.java.event.Event;
 import cs.java.event.EventImpl;
 import cs.java.lang.Lang;
 
 public class AndroidLang {
+
+	public static final Object INVOKE_FAILED = "invoke_failed";
+
 	private static Application aplication;
 
 	public static void alert(int stringId) {
 		Lang.alert(aplication.getString(stringId));
+	}
+	
+	public static boolean isDebug(){
+		return BuildConfig.DEBUG;
+	}
+
+	public static boolean androidMinimum(int verCode) {
+		if (android.os.Build.VERSION.RELEASE.startsWith("1.0"))
+			return verCode == 1;
+		else if (android.os.Build.VERSION.RELEASE.startsWith("1.1"))
+			return verCode <= 2;
+		else if (android.os.Build.VERSION.RELEASE.startsWith("1.5"))
+			return verCode <= 3;
+		else return android.os.Build.VERSION.SDK_INT >= verCode;
 	}
 
 	public static byte[] asArray(InputStream input) {
@@ -106,8 +128,33 @@ public class AndroidLang {
 		try {
 			return object.getClass().getMethod(methodName, (Class<?>[]) null).invoke(object);
 		} catch (Exception e) {
-			throw exception(e);
+			return INVOKE_FAILED;
 		}
+	}
+
+	public static <T> Object invoke(Object object, String methodName, Class<?>[] types,
+			Object[] argument) {
+		try {
+			return object.getClass().getMethod(methodName, types).invoke(object, argument);
+		} catch (Exception e) {
+			return INVOKE_FAILED;
+		}
+	}
+
+	public static <T> Object invoke(Object object, String methodName, Class<T> type, T argument) {
+		try {
+			return object.getClass().getMethod(methodName, type).invoke(object, argument);
+		} catch (Exception e) {
+			return INVOKE_FAILED;
+		}
+	}
+
+	public static Iteration<View> iterate(final ViewGroup layout) {
+		return new GenericIterator<View>(layout.getChildCount()) {
+			protected View getValue() {
+				return layout.getChildAt(index());
+			}
+		};
 	}
 
 	public static boolean respondsTo(Object object, String methodName) {

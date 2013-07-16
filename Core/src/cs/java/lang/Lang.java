@@ -35,9 +35,11 @@ public class Lang {
 	public static final boolean NO = false;
 	public static final int SECOND = 1000;
 	public static final int HALFSECOND = 500;
+	public static final int THOUSAND = 1000;
 	public static final int MINUTE = 60 * SECOND;
 
 	public static final int HOUR = 60 * MINUTE;
+	public static final int DAY = 24 * HOUR;
 
 	public static <T> void add(List<T> list, T... items) {
 		for (T item : items)
@@ -46,6 +48,7 @@ public class Lang {
 
 	public static void alert(String... messages) {
 		impl.alert((Object[]) messages);
+		impl.info((Object[]) messages);
 	}
 
 	public static Object[] array(Collection<?> list) {

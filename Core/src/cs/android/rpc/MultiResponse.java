@@ -1,8 +1,6 @@
 package cs.android.rpc;
 
-import static cs.java.lang.Lang.doLater;
 import static cs.java.lang.Lang.is;
-import cs.java.lang.Run;
 
 public class MultiResponse extends Response<Void> {
 
@@ -38,13 +36,5 @@ public class MultiResponse extends Response<Void> {
 		// TODO Auto-generated method stub
 		super.failed(message);
 	}
-
-	public void finish() {
-		doLater(new Run() {
-			public void run() {
-				success();
-			}
-		});
-	}
-
+	
 }

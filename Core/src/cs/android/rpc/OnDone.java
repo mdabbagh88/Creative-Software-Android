@@ -2,6 +2,8 @@ package cs.android.rpc;
 
 import static cs.java.lang.Lang.no;
 import cs.android.IActivityWidget;
+import cs.java.event.Event;
+import cs.java.event.Event.EventRegistration;
 
 public abstract class OnDone<Data> extends OnResponseBase<Data> {
 
@@ -13,6 +15,10 @@ public abstract class OnDone<Data> extends OnResponseBase<Data> {
 
 	public OnDone(Response<Data> request) {
 		this(null, request);
+	}
+	
+	@Override public <T> void onEvent(Event<T> event, EventRegistration registration, T argument) {
+		super.onEvent(event, registration, argument);
 	}
 
 }

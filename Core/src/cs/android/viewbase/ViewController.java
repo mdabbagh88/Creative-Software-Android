@@ -14,8 +14,6 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.view.View;
 import cs.android.IActivityWidget;
@@ -183,13 +181,7 @@ public abstract class ViewController extends Widget<View> implements IActivityWi
 		return activity().getIntent().getExtras();
 	}
 
-	protected PackageInfo getPackageInfo() {
-		try {
-			return activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
-		} catch (NameNotFoundException e) {
-			return null;
-		}
-	}
+	
 
 	public void goBack() {
 		if (is(_dialog))
@@ -287,39 +279,39 @@ public abstract class ViewController extends Widget<View> implements IActivityWi
 		activity().setContentView(layoutResId);
 	}
 
-	protected void startActivity(Class<? extends Activity> activityClass) {
+	public void startActivity(Class<? extends Activity> activityClass) {
 		startActivity(new Intent(activity(), activityClass));
 	}
 
-	protected void startActivity(Intent intent) {
+	public void startActivity(Intent intent) {
 		activity().startActivity(intent);
 	}
 
-	protected void startActivityForResult(Class<? extends Activity> activityClass, int requestCode) {
+	public void startActivityForResult(Class<? extends Activity> activityClass, int requestCode) {
 		startActivityForResult(new Intent(activity(), activityClass), requestCode);
 	}
 
-	protected void startActivityForResult(Intent intent, int requestCode) {
+	public void startActivityForResult(Intent intent, int requestCode) {
 		activity().startActivityForResult(intent, requestCode);
 	}
 
-	protected void switchActivity(Class<? extends Activity> activityClass) {
+	public void switchActivity(Class<? extends Activity> activityClass) {
 		switchActivity(new Intent(activity(), activityClass));
 	}
 
-	protected void switchActivity(Class<? extends Activity> activityClass, String key,
+	public void switchActivity(Class<? extends Activity> activityClass, String key,
 			Serializable value) {
 		Intent intent = new Intent(activity(), activityClass);
 		intent.putExtra(key, value);
 		switchActivity(intent);
 	}
 
-	protected void switchActivity(Class<? extends Activity> activityClass, int resultCode) {
+	public void switchActivity(Class<? extends Activity> activityClass, int resultCode) {
 		activity().setResult(resultCode);
 		switchActivity(new Intent(activity(), activityClass));
 	}
 
-	protected void switchActivity(Intent intent) {
+	public void switchActivity(Intent intent) {
 		startActivity(intent);
 		activity().finish();
 	}

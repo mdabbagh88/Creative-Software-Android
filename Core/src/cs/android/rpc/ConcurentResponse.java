@@ -4,6 +4,10 @@ public class ConcurentResponse extends Response<Void> {
 
 	private int _requestCount;
 
+	public int requestCount() {
+		return _requestCount;
+	}
+
 	public ConcurentResponse(Response<?>... responses) {
 		addAll(responses);
 	}
@@ -21,7 +25,6 @@ public class ConcurentResponse extends Response<Void> {
 				_requestCount--;
 				if (_requestCount == 0) {
 					ConcurentResponse.this.success();
-					ConcurentResponse.this.cancel();
 				}
 			}
 		};
@@ -33,4 +36,10 @@ public class ConcurentResponse extends Response<Void> {
 			add(response);
 		return this;
 	}
+
+	public void onAddDone() {
+		if (_requestCount == 0)
+			successLater();
+	}
+	
 }

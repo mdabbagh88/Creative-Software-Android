@@ -9,7 +9,6 @@ import android.hardware.Camera;
 import android.os.Handler;
 import android.util.Log;
 import android.view.SurfaceHolder;
-
 import cs.codescanner.scanner.PlanarYUVLuminanceSource;
 
 /**
@@ -149,7 +148,7 @@ public final class CameraManager {
 	public void openDriver(SurfaceHolder holder) throws IOException {
 		Camera theCamera = camera;
 		if (theCamera == null) {
-			theCamera = Camera.open();
+			theCamera = Camera.open(0);
 			if (theCamera == null) throw new IOException();
 			camera = theCamera;
 		}

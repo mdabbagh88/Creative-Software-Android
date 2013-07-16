@@ -35,9 +35,7 @@ public class Settings extends ContextPresenter {
 
 	private final SharedPreferences preferences;
 	private final String _name;
-
 	public static final String SETTING_USERNAME = "username";
-
 	public static final String SETTING_PASSWORD = "password";
 
 	public Settings() {
@@ -62,10 +60,6 @@ public class Settings extends ContextPresenter {
 	public void clearCredentials() {
 		clear(SETTING_USERNAME);
 		clear(SETTING_PASSWORD);
-	}
-
-	protected SharedPreferences getPreferences(String key) {
-		return context().getSharedPreferences(key, Context.MODE_PRIVATE);
 	}
 
 	public boolean has(String key) {
@@ -109,12 +103,8 @@ public class Settings extends ContextPresenter {
 	public Integer loadInteger(String key, int defaultValue) {
 		return preferences.getInt(key, defaultValue);
 	}
-
-	private JSONContainer loadJSONContainer(String key) {
-		String loadString = loadString(key);
-		if (no(loadString)) return null;
-		JSONContainer parsed = json().parse(loadString);
-		return parsed;
+	public Long loadLong(String key, long defaultValue) {
+		return preferences.getLong(key, defaultValue);
 	}
 
 	public JSONObject loadObject(String key) {
@@ -134,22 +124,8 @@ public class Settings extends ContextPresenter {
 		save(SETTING_USERNAME, credentials.getUsername(), SETTING_PASSWORD, credentials.getPassword());
 	}
 
-	private void save(final Editor editor) {
-		if (respondsTo(editor, "apply"))
-			invoke(editor, "apply");
-		else editor.commit();
-	}
-
-	protected void save(String... keysvalues) {
-		Editor editor = preferences.edit();
-		for (MapItem<String, String> keyvalue : iterate(map((Object[]) keysvalues)))
-			editor.putString(keyvalue.key(), keyvalue.value());
-		save(editor);
-	}
-
 	public void save(String key, Boolean value) {
-		if (no(value))
-			clear(key);
+		if (no(value)) clear(key);
 		else {
 			Editor editor = preferences.edit();
 			editor.putBoolean(key, value);
@@ -158,30 +134,35 @@ public class Settings extends ContextPresenter {
 	}
 
 	public void save(String key, Integer value) {
-		if (no(value))
-			clear(key);
+		if (no(value)) clear(key);
 		else {
 			Editor editor = preferences.edit();
 			editor.putInt(key, value);
 			save(editor);
 		}
 	}
+	
+	public void save(String key, Long value) {
+		if (no(value)) clear(key);
+		else {
+			Editor editor = preferences.edit();
+			editor.putLong(key, value);
+			save(editor);
+		}
+	}
 
 	public void save(String key, JSONData data) {
-		if (no(data))
-			clear(key);
+		if (no(data)) clear(key);
 		else save(key, data.save().toJSON());
 	}
 
 	public <T extends JSONData> void save(String key, List<T> data) {
-		if (no(data))
-			clear(key);
+		if (no(data)) clear(key);
 		else save(key, json().create(data).toJSON());
 	}
 
 	public <T extends JSONData> void save(String key, Map<String, T> data) {
-		if (no(data))
-			clear(key);
+		if (no(data)) clear(key);
 		else save(key, json().createJSONDataMap(data).toJSON());
 	}
 
@@ -189,6 +170,29 @@ public class Settings extends ContextPresenter {
 		if (no(value)) clear(key);
 		Editor editor = preferences.edit();
 		editor.putString(key, value);
+		save(editor);
+	}
+
+	private JSONContainer loadJSONContainer(String key) {
+		String loadString = loadString(key);
+		if (no(loadString)) return null;
+		JSONContainer parsed = json().parse(loadString);
+		return parsed;
+	}
+
+	private void save(final Editor editor) {
+		if (respondsTo(editor, "apply")) invoke(editor, "apply");
+		else editor.commit();
+	}
+
+	protected SharedPreferences getPreferences(String key) {
+		return context().getSharedPreferences(key, Context.MODE_PRIVATE);
+	}
+
+	protected void save(String... keysvalues) {
+		Editor editor = preferences.edit();
+		for (MapItem<String, String> keyvalue : iterate(map((Object[]) keysvalues)))
+			editor.putString(keyvalue.key(), keyvalue.value());
 		save(editor);
 	}
 
