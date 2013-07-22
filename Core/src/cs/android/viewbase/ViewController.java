@@ -15,6 +15,8 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import cs.android.IActivityWidget;
 import cs.java.event.Event;
@@ -336,5 +338,18 @@ public abstract class ViewController extends Widget<View> implements IActivityWi
 					}
 				}
 			};
+	}
+
+	protected boolean onCreateOptionsMenu(Menu menu) {
+		return false;
+	}
+
+	protected boolean onOptionsItemSelected(MenuItem item) {
+		return false;
+	}
+
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

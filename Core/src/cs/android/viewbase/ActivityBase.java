@@ -8,6 +8,8 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.Display;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import cs.java.lang.Value;
 
 public abstract class ActivityBase extends Activity implements IsActivityBase {
@@ -110,5 +112,17 @@ public abstract class ActivityBase extends Activity implements IsActivityBase {
 	@Override protected void onStop() {
 		presenter.onStop();
 		super.onStop();
+	}
+	
+	@Override public boolean onCreateOptionsMenu(Menu menu) {
+		return presenter.onCreateOptionsMenu(menu);
+	}
+	
+	@Override public boolean onOptionsItemSelected(MenuItem item) {
+		return presenter.onOptionsItemSelected(item);
+	}
+
+	@Override public boolean onPrepareOptionsMenu(Menu menu) {
+		return presenter.onPrepareOptionsMenu(menu);
 	}
 }
