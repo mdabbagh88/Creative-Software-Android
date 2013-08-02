@@ -24,7 +24,7 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
 import cs.android.BuildConfig;
-import cs.android.IActivityWidget;
+import cs.android.viewbase.ViewController;
 import cs.java.collections.GenericIterator;
 import cs.java.collections.Iteration;
 import cs.java.event.Event;
@@ -40,8 +40,8 @@ public class AndroidLang {
 	public static void alert(int stringId) {
 		Lang.alert(aplication.getString(stringId));
 	}
-	
-	public static boolean isDebug(){
+
+	public static boolean isDebug() {
 		return BuildConfig.DEBUG;
 	}
 
@@ -120,7 +120,7 @@ public class AndroidLang {
 		return aplication;
 	}
 
-	public static Drawable getDrawable(IActivityWidget hasactivity, int drawable) {
+	public static Drawable getDrawable(ViewController hasactivity, int drawable) {
 		return hasactivity.activity().getResources().getDrawable(drawable);
 	}
 

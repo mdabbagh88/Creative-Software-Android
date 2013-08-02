@@ -1,6 +1,7 @@
 package cs.android.view;
 
 import static cs.android.lang.AndroidLang.event;
+import static cs.java.lang.Lang.YES;
 import static cs.java.lang.Lang.fire;
 import static cs.java.lang.Lang.list;
 import static cs.java.lang.Lang.no;
@@ -10,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import cs.android.IActivityWidget;
 import cs.android.viewbase.ViewController;
 import cs.java.collections.List;
 import cs.java.event.Event;
@@ -41,12 +41,12 @@ public class DataListPresenter<RowType> extends ViewController {
 	private final RowFactory<RowType> viewFactory;
 	private int savedSelectionIndex;
 
-	public <Parent extends IActivityWidget & RowFactory<RowType>> DataListPresenter(Parent parent) {
+	public <Parent extends ViewController & RowFactory<RowType>> DataListPresenter(Parent parent) {
 		super(parent);
 		this.viewFactory = parent;
 	}
 
-	public <Parent extends IActivityWidget & RowFactory<RowType>> DataListPresenter(Parent parent,
+	public <Parent extends ViewController & RowFactory<RowType>> DataListPresenter(Parent parent,
 			int listViewId) {
 		super(parent, listViewId);
 		this.viewFactory = parent;
@@ -74,6 +74,11 @@ public class DataListPresenter<RowType> extends ViewController {
 	public void prependData(RowType status) {
 		dataList.add(0, status);
 		listAdapter.notifyDataSetChanged();
+	}
+
+	@Override protected void onCreate() {
+		super.onCreate();
+		asAbsListView().setFastScrollEnabled(YES);
 	}
 
 	public void refresh() {

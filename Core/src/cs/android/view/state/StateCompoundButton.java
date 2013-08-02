@@ -1,6 +1,5 @@
 package cs.android.view.state;
 
-import cs.android.IActivityWidget;
 import cs.android.viewbase.ViewController;
 
 public class StateCompoundButton extends ViewController {
@@ -8,7 +7,7 @@ public class StateCompoundButton extends ViewController {
 	private final int viewId;
 	private boolean isChecked;
 
-	public StateCompoundButton(IActivityWidget parent, int viewId) {
+	public StateCompoundButton(ViewController parent, int viewId) {
 		super(parent);
 		this.viewId = viewId;
 	}

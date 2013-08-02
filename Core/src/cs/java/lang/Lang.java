@@ -160,7 +160,7 @@ public class Lang {
 	}
 
 	public static void error(Object... values) {
-		error(new Throwable(), values);
+		impl.error(null, values);
 	}
 
 	public static void error(Throwable e, Object... values) {

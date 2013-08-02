@@ -3,7 +3,10 @@ package cs.android.view;
 import static cs.java.lang.Lang.is;
 import static cs.java.lang.Lang.no;
 import android.app.Dialog;
-import cs.android.IActivityWidget;
+import android.graphics.Rect;
+import android.view.Gravity;
+import android.view.Window;
+import android.view.WindowManager.LayoutParams;
 import cs.android.R;
 import cs.android.rpc.OnDone;
 import cs.android.rpc.Response;
@@ -15,7 +18,7 @@ public class ProgressDialog extends ViewController {
 	private Response<?> request;
 	private OnDone<?> onDone;
 
-	public ProgressDialog(IActivityWidget parent) {
+	public ProgressDialog(ViewController parent) {
 		super(parent);
 	}
 
@@ -33,10 +36,23 @@ public class ProgressDialog extends ViewController {
 
 	public void showProgress() {
 		if (is(progressDialog)) return;
-		progressDialog = new Dialog(activity(), R.style.LoadingDialogTheme);
+		progressDialog = new Dialog(activity(), android.R.style.Theme_Light_NoTitleBar_Fullscreen);
 		progressDialog.setCancelable(false);
 		progressDialog.setContentView(R.layout.load_indicator_dialog);
+		Window window = progressDialog.getWindow();
+		window.setGravity(Gravity.BOTTOM);
+		window.setLayout(LayoutParams.MATCH_PARENT, getDisplayHeight() - getStatusBarHeight());
 		progressDialog.show();
+	}
+
+	private int getStatusBarHeight() {
+		Rect rectgle = new Rect();
+		Window window = activity().getWindow();
+		window.getDecorView().getWindowVisibleDisplayFrame(rectgle);
+		int statusBarHeight = rectgle.top;
+		int contentViewTop = window.findViewById(Window.ID_ANDROID_CONTENT).getTop();
+		int titeBarHeight = contentViewTop - statusBarHeight;
+		return titeBarHeight + statusBarHeight;
 	}
 
 	private void onRequestDone() {

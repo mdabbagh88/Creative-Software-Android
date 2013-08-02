@@ -21,7 +21,7 @@ public abstract class Task implements Run, Listener {
 	public Task(ViewController parent, Event<?>... events) {
 		for (Event<?> event : events)
 			registrations.add(event.add(this));
-		parent.getOnPause().add(new Listener() {
+		parent.onPause.add(new Listener() {
 			public <T> void onEvent(Event<T> event, EventRegistration r, T arg) {
 				r.cancel();
 				cancel();

@@ -23,6 +23,7 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
+import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import android.widget.AbsListView;
@@ -52,6 +53,7 @@ import cs.android.HasContext;
 import cs.android.aq.CSQuery;
 import cs.java.collections.List;
 import cs.java.common.Point;
+import cs.java.lang.Call;
 
 public class Widget<T extends View> extends ContextPresenter implements IsView {
 
@@ -150,13 +152,19 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		return fadeIn(getView(view));
 	}
 
-	public AlphaAnimation fadeIn(View view) {
-		show(view);
+	public AlphaAnimation fadeIn(final View view) {
 		AlphaAnimation animation = new AlphaAnimation(0.0f, 1.0f);
+		if (isVisible(view) && is(asView().getParent())) return animation;
+
+		if (is(view.getAnimation())) {
+			view.getAnimation().cancel();
+			view.clearAnimation();
+		}
 		animation.setDuration(300);
-		animation.setInterpolator(new AccelerateInterpolator());
+		animation.setInterpolator(new DecelerateInterpolator());
 		animation.setAnimationListener(new AnimationListener() {
 			public void onAnimationEnd(Animation animation) {
+				show(view);
 			}
 
 			public void onAnimationRepeat(Animation animation) {
@@ -169,22 +177,37 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		return animation;
 	}
 
-	public void fadeOut() {
-		fadeOut(asView());
+	private boolean isHidden(View view) {
+		return !isVisible(view);
 	}
 
-	public void fadeOut(int view) {
-		fadeOut(getView(view));
+	public AlphaAnimation fadeOut() {
+		return fadeOut(asView());
 	}
 
-	public void fadeOut(final View view) {
-		if (!isVisible(view)) return;
+	public AlphaAnimation fadeOut(int view) {
+		return fadeOut(getView(view));
+	}
+
+	public AlphaAnimation fadeOut(final View view, final Call<View> onDone) {
 		AlphaAnimation animation = new AlphaAnimation(1.0f, 0.0f);
-		animation.setDuration(300);
+
+		if (is(view.getAnimation())) {
+			view.getAnimation().cancel();
+			view.clearAnimation();
+		}
+
+		if (isHidden(view)) {
+			if (is(onDone)) onDone.onCall(view);
+			return animation;
+		}
+
+		animation.setDuration(600);
 		animation.setInterpolator(new AccelerateInterpolator());
 		animation.setAnimationListener(new AnimationListener() {
 			public void onAnimationEnd(Animation animation) {
 				hide(view);
+				if (is(onDone)) onDone.onCall(view);
 			}
 
 			public void onAnimationRepeat(Animation animation) {
@@ -194,6 +217,11 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 			}
 		});
 		view.startAnimation(animation);
+		return animation;
+	}
+
+	public AlphaAnimation fadeOut(final View view) {
+		return fadeOut(view, null);
 	}
 
 	public Button getButton(int id) {
@@ -329,11 +357,6 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		hide(getView(viewId));
 	}
 
-	public void hide(int... viewIds) {
-		for (int id : viewIds)
-			hide(getView(id));
-	}
-
 	public void hide(View view) {
 		view.setVisibility(View.GONE);
 	}
@@ -405,13 +428,15 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 	}
 
 	public void setPercentAspectWidth(int viewId, int percent, int minimal, int maximal) {
+		setPercentAspectWidth(getView(viewId), percent, minimal, maximal);
+	}
+
+	public void setPercentAspectWidth(View view, int percent, int minimal, int maximal) {
 		float onePercent = getDisplayWidth() / (float) 100;
 		float wantedWidth = onePercent * percent;
-		if (set(minimal) && wantedWidth < minimal)
-			wantedWidth = minimal;
+		if (set(minimal) && wantedWidth < minimal) wantedWidth = minimal;
 		else if (set(maximal) && wantedWidth > maximal) wantedWidth = maximal;
 
-		View view = getView(viewId);
 		float scalingFactor = wantedWidth / view.getLayoutParams().width;
 		int scaledHeight = (int) (view.getLayoutParams().height * scalingFactor);
 
@@ -433,8 +458,7 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 	public void setPercentWidth(View view, int percent, int minimal, int maximal) {
 		double onePercent = getDisplayWidth() / 100;
 		int wantedSize = (int) (onePercent * percent);
-		if (set(minimal) && wantedSize < minimal)
-			wantedSize = minimal;
+		if (set(minimal) && wantedSize < minimal) wantedSize = minimal;
 		else if (set(maximal) && wantedSize > maximal) wantedSize = maximal;
 		LayoutParams layoutParams = view.getLayoutParams();
 		layoutParams.width = wantedSize;
@@ -459,8 +483,7 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 	}
 
 	public void setViewVisible(int viewId, boolean visible) {
-		if (visible)
-			show(viewId);
+		if (visible) show(viewId);
 		else hide(viewId);
 	}
 
@@ -469,14 +492,12 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 	}
 
 	public void setVisible(boolean visible) {
-		if (visible)
-			asView().setVisibility(View.VISIBLE);
+		if (visible) asView().setVisibility(View.VISIBLE);
 		else asView().setVisibility(View.GONE);
 	}
 
-	public void show(int... viewIds) {
-		for (int id : viewIds)
-			show(getView(id));
+	public void show(int id) {
+		show(getView(id));
 	}
 
 	public void show(View view) {

@@ -1,5 +1,5 @@
 package cs.android.viewbase;
 
 public interface ScreenFactory {
-	ViewController createView(ScreenHostView parent, String screenId);
+	ViewController createView(ScreenHostViewBase parent, String screenId);
 }

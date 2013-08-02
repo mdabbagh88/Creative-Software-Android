@@ -1,10 +1,12 @@
 package cs.java.json;
 
 import static cs.java.lang.Lang.asDouble;
+import static cs.java.lang.Lang.equal;
 import static cs.java.lang.Lang.is;
 import static cs.java.lang.Lang.json;
 import static cs.java.lang.Lang.list;
 import static cs.java.lang.Lang.no;
+import static cs.java.lang.Lang.set;
 
 import java.util.Map;
 
@@ -69,14 +71,17 @@ public abstract class JSONDataBase implements JSONData {
 
 	public <T extends JSONData> void put(String key, List<T> value) {
 		data.put(key, json().create(value));
+		unsaved(true);
 	}
 
 	public <T extends JSONData> void put(String key, Map<String, T> value) {
 		data.put(key, json().createJSONDataMap(value));
+		unsaved(true);
 	}
 
 	public <T extends JSONData> void putStringMap(String key, Map<String, String> value) {
 		data.put(key, json().create(value));
+		unsaved(true);
 	}
 
 	@Override public final JSONObject save() {
@@ -107,12 +112,24 @@ public abstract class JSONDataBase implements JSONData {
 	protected void onSave(JSONObject data) {
 	}
 
-	protected void put(String string, Number value) {
-		data.put(string, value);
+	protected void put(String key, Number value) {
+		if (equal(data.getNumber(key), value)) return;
+		data.put(key, value);
+		unsaved(true);
 	}
 
-	protected void put(String string, String value) {
-		data.put(string, value);
+	protected void put(String key, String value) {
+		if (equal(getString(key), value)) return;
+		data.put(key, value);
+		unsaved(true);
+	}
+
+	public boolean unsaved() {
+		return set(data.getBoolean("offline"));
+	}
+
+	protected void unsaved(boolean offline) {
+		data.put("offline", offline);
 	}
 
 	protected void putNumberString(String string, String value) {

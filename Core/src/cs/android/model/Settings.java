@@ -1,7 +1,5 @@
 package cs.android.model;
 
-import static cs.android.lang.AndroidLang.invoke;
-import static cs.android.lang.AndroidLang.respondsTo;
 import static cs.java.lang.Lang.is;
 import static cs.java.lang.Lang.iterate;
 import static cs.java.lang.Lang.json;
@@ -14,6 +12,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.Build;
 import cs.android.viewbase.ContextPresenter;
 import cs.java.collections.List;
 import cs.java.collections.MapItem;
@@ -103,6 +102,7 @@ public class Settings extends ContextPresenter {
 	public Integer loadInteger(String key, int defaultValue) {
 		return preferences.getInt(key, defaultValue);
 	}
+
 	public Long loadLong(String key, long defaultValue) {
 		return preferences.getLong(key, defaultValue);
 	}
@@ -141,7 +141,7 @@ public class Settings extends ContextPresenter {
 			save(editor);
 		}
 	}
-	
+
 	public void save(String key, Long value) {
 		if (no(value)) clear(key);
 		else {
@@ -181,7 +181,7 @@ public class Settings extends ContextPresenter {
 	}
 
 	private void save(final Editor editor) {
-		if (respondsTo(editor, "apply")) invoke(editor, "apply");
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) editor.apply();
 		else editor.commit();
 	}
 

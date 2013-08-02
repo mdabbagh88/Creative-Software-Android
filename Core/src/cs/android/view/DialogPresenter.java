@@ -11,7 +11,6 @@ import android.content.DialogInterface.OnDismissListener;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
-import cs.android.IActivityWidget;
 import cs.android.viewbase.ViewController;
 import cs.java.lang.Call;
 import cs.java.lang.Factory;
@@ -56,11 +55,11 @@ public class DialogPresenter extends ViewController {
 	private Factory<View> viewFactory;
 	private boolean isVisible;
 
-	public DialogPresenter(IActivityWidget hasActivity) {
+	public DialogPresenter(ViewController hasActivity) {
 		super(hasActivity);
 	}
 
-	public DialogPresenter(IActivityWidget hasActivity, int viewId) {
+	public DialogPresenter(ViewController hasActivity, int viewId) {
 		super(hasActivity);
 		this.viewId = viewId;
 	}
@@ -141,7 +140,7 @@ public class DialogPresenter extends ViewController {
 		if (isVisible) showDialog();
 	}
 
-	@Override protected void onDestroy() {
+	@Override public void onDestroy() {
 		super.onDestroy();
 		dialog = null;
 	}

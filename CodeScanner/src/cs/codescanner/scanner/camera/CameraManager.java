@@ -102,12 +102,10 @@ public final class CameraManager {
 			if (camera == null) return null;
 			Point screenResolution = configManager.getScreenResolution();
 			int width = screenResolution.x * 3 / 4;
-			if (width < MIN_FRAME_WIDTH)
-				width = MIN_FRAME_WIDTH;
+			if (width < MIN_FRAME_WIDTH) width = MIN_FRAME_WIDTH;
 			else if (width > MAX_FRAME_WIDTH) width = MAX_FRAME_WIDTH;
 			int height = screenResolution.y * 3 / 4;
-			if (height < MIN_FRAME_HEIGHT)
-				height = MIN_FRAME_HEIGHT;
+			if (height < MIN_FRAME_HEIGHT) height = MIN_FRAME_HEIGHT;
 			else if (height > MAX_FRAME_HEIGHT) height = MAX_FRAME_HEIGHT;
 			int leftOffset = (screenResolution.x - width) / 2;
 			int topOffset = (screenResolution.y - height) / 2;
@@ -148,7 +146,7 @@ public final class CameraManager {
 	public void openDriver(SurfaceHolder holder) throws IOException {
 		Camera theCamera = camera;
 		if (theCamera == null) {
-			theCamera = Camera.open(0);
+			theCamera = Camera.open();
 			if (theCamera == null) throw new IOException();
 			camera = theCamera;
 		}

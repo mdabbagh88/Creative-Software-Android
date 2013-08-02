@@ -7,15 +7,14 @@ import android.view.ViewGroup;
 
 public class ActivityManager {
 
-	protected final IsActivityBase activityBase;
+	protected final CSActivity activityBase;
 
-	public ActivityManager(IsActivityBase activityBase) {
+	public ActivityManager(CSActivity activityBase) {
 		this.activityBase = activityBase;
 	}
 
 	public ViewController create() {
-		ViewController presenter = (ViewController) activityBase.activity()
-				.getLastNonConfigurationInstance();
+		ViewController presenter = (ViewController) activityBase.activity().getSavedInstance();
 		if (no(presenter)) return activityBase.create();
 		return presenter;
 	}

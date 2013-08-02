@@ -1,6 +1,8 @@
 package cs.android.viewbase;
 
+import static cs.android.lang.AndroidLang.INVOKE_FAILED;
 import static cs.android.lang.AndroidLang.event;
+import static cs.android.lang.AndroidLang.invoke;
 import static cs.java.lang.Lang.No;
 import static cs.java.lang.Lang.fire;
 import static cs.java.lang.Lang.is;
@@ -11,119 +13,106 @@ import static cs.java.lang.Lang.unexpected;
 import java.io.Serializable;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.support.v4.app.FragmentManager;
+import android.view.Display;
 import android.view.View;
-import cs.android.IActivityWidget;
+import android.view.WindowManager.LayoutParams;
+
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.MenuInflater;
+
 import cs.java.event.Event;
 import cs.java.event.Task;
 import cs.java.lang.Value;
 
-public abstract class ViewController extends Widget<View> implements IActivityWidget {
+public abstract class ViewController extends Widget<View> {
 
-	protected Activity activity;
+	protected Activity _activity;
 	private Bundle state;
-	private final Event<Void> eventPause = event();
-	private final Event<Bundle> eventCreate = event();
-	private final Event<Value<Boolean>> onBack = event();
-	private final Event<Void> eventStart = event();
-	private final Event<Void> eventStop = event();
-	private final Event<Bundle> eventSaveInstance = event();
-	private final Event<Void> eventDestroy = event();
-	private final Event<Void> eventResume = event();
-	private final Event<ActivityResult> eventActivityResult = event();
+	public final Event<Void> onPause = event();
+	public final Event<Bundle> onCreate = event();
+	public final Event<Value<Boolean>> onBack = event();
+	public final Event<Void> onStart = event();
+	public final Event<Void> onStop = event();
+	public final Event<Bundle> onSaveInstance = event();
+	public final Event<Void> onDestroy = event();
+	public final Event<Void> onResume = event();
+	public final Event<OnMenu> onPrepareOptionsMenu = event();
+	public final Event<OnMenuItem> onOptionsItemSelected = event();
+	public final Event<OnMenu> onCreateOptionsMenu = event();
+	public final Event<ActivityResult> onActivityResult = event();
 	private Task parentEventsTask;
 	private boolean created;
 	private boolean resumed;
 	private boolean paused;
 	private boolean destroyed;
-	protected IActivityWidget parent;
+	protected final ViewController _parent;
 	private int viewId;
 	private LayoutId layoutId;
 	public static ViewController root;
-	private Dialog _dialog;
 
-	public ViewController(IActivityWidget parent) {
-		this.parent = parent;
+	public ViewController(ViewController parent) {
+		this._parent = parent;
 		listenParent();
 	}
 
-	public void setDialog(Dialog dialog) {
-		_dialog = dialog;
+	public FragmentManager getSupportFragmentManager() {
+		Object manager = invoke(activity(), "getSupportFragmentManager");
+		if (manager == INVOKE_FAILED) return null;
+		return (FragmentManager) manager;
 	}
 
-	public ViewController(IActivityWidget parent, int viewId) {
-		this.parent = parent;
+	public ViewController(ViewController parent, int viewId) {
+		this._parent = parent;
 		this.viewId = viewId;
 		listenParent();
 	}
 
-	public ViewController(IActivityWidget parent, LayoutId id) {
-		this.parent = parent;
+	@SuppressWarnings("deprecation") public int getScreenOrientation() {
+		Display getOrient = activity().getWindowManager().getDefaultDisplay();
+		int orientation = Configuration.ORIENTATION_UNDEFINED;
+		if (getOrient.getWidth() == getOrient.getHeight()) {
+			orientation = Configuration.ORIENTATION_SQUARE;
+		} else {
+			if (getOrient.getWidth() < getOrient.getHeight()) {
+				orientation = Configuration.ORIENTATION_PORTRAIT;
+			} else {
+				orientation = Configuration.ORIENTATION_LANDSCAPE;
+			}
+		}
+		return orientation;
+	}
+
+	public ViewController(ViewController parent, LayoutId id) {
+		this._parent = parent;
 		layoutId = id;
 		listenParent();
 	}
 
 	public ViewController(LayoutId layoutId) {
 		this.layoutId = layoutId;
+		_parent = null;
 		root = this;
 		listenParent();
 	}
 
-	@Override public Activity activity() {
-		return activity;
+	public Activity activity() {
+		return _activity;
 	}
 
-	@Override public View asView() {
-		if (is(getView()))
-			return getView();
+	public View asView() {
+		if (is(getView())) return getView();
 		else if (set(viewId)) {
-			setView(parent.asView().findViewById(viewId));
-			if (no(getView())) throw unexpected("Expected", this, "in parent", parent);
-		} else if (set(layoutId))
-			setView(inflateLayout(layoutId.value));
-		else setView(parent.asView());
+			setView(_parent.asView().findViewById(viewId));
+			if (no(getView())) throw unexpected("Expected", this, "in parent", _parent);
+		} else if (set(layoutId)) setView(inflateLayout(layoutId.value));
+		else setView(_parent.asView());
 		return getView();
-	}
-
-	@Override public Event<ActivityResult> getOnActivityResult() {
-		return eventActivityResult;
-	}
-
-	@Override public Event<Value<Boolean>> getOnBack() {
-		return onBack;
-	}
-
-	@Override public Event<Bundle> getOnCreate() {
-		return eventCreate;
-	}
-
-	@Override public Event<Void> getOnDestroy() {
-		return eventDestroy;
-	}
-
-	@Override public Event<Void> getOnPause() {
-		return eventPause;
-	}
-
-	@Override public Event<Void> getOnResume() {
-		return eventResume;
-	}
-
-	@Override public Event<Bundle> getOnSaveInstance() {
-		return eventSaveInstance;
-	}
-
-	@Override public Event<Void> getOnStart() {
-		return eventStart;
-	}
-
-	@Override public Event<Void> getOnStop() {
-		return eventStop;
 	}
 
 	public Bundle getState() {
@@ -134,8 +123,8 @@ public abstract class ViewController extends Widget<View> implements IActivityWi
 		return viewId;
 	}
 
-	@Override public Context context() {
-		if (is(parent)) return parent.context();
+	public Context context() {
+		if (is(_parent)) return _parent.context();
 		return super.context();
 	}
 
@@ -147,35 +136,34 @@ public abstract class ViewController extends Widget<View> implements IActivityWi
 		return destroyed;
 	}
 
-	@Override public boolean isPaused() {
+	public boolean isPaused() {
 		return paused;
 	}
 
-	@Override public boolean isResumed() {
+	public boolean isResumed() {
 		return resumed;
 	}
 
-	@Override public void onBackPressed(Value<Boolean> goBack) {
+	public void onBackPressed(Value<Boolean> goBack) {
 		fire(onBack, goBack);
 	}
 
-	@Override public void onDeinitialize(Bundle state) {
+	public void onDeinitialize(Bundle state) {
+		parentEventsTask.cancel();
 		onPause();
 		onSaveInstanceState(state);
 		onStop();
-		onDestroy();
-		parentEventsTask.cancel();
 	}
 
-	@Override public void onInitialize(Bundle state) {
+	public void onInitialize(Bundle state) {
 		onCreate(state);
 		onStart();
 		onResume();
 	}
 
-	void setActivity(Activity activity) {
+	protected void setActivity(Activity activity) {
 		if (paused) setView(null);
-		this.activity = activity;
+		_activity = activity;
 		setContext(activity);
 	}
 
@@ -183,13 +171,8 @@ public abstract class ViewController extends Widget<View> implements IActivityWi
 		return activity().getIntent().getExtras();
 	}
 
-	
-
 	public void goBack() {
-		if (is(_dialog))
-			_dialog.onBackPressed();
-		else if (is(parent))
-			parent.goBack();
+		if (is(_parent)) _parent.goBack();
 		else activity().onBackPressed();
 	}
 
@@ -201,8 +184,8 @@ public abstract class ViewController extends Widget<View> implements IActivityWi
 		return Intent.ACTION_MAIN.equals(activity().getIntent().getAction());
 	}
 
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		fire(eventActivityResult, new ActivityResult(requestCode, resultCode, data));
+	protected void onActivityResult(ActivityResult result) {
+		fire(onActivityResult, result);
 	}
 
 	/**
@@ -212,12 +195,17 @@ public abstract class ViewController extends Widget<View> implements IActivityWi
 	}
 
 	protected void onCreate(Bundle state) {
-		if (is(parent)) setActivity(parent.activity());
+		if (is(_parent)) setActivity(_parent.activity());
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+			activity().getWindow().setFlags(LayoutParams.FLAG_HARDWARE_ACCELERATED,
+					LayoutParams.FLAG_HARDWARE_ACCELERATED);
+		// overridePendingTransition(R.anim.right_to_center, R.anim.center_to_left);
+
 		this.state = state;
-		fire(eventCreate, state);
+		fire(onCreate, state);
 		onCreate();
-		if (no(state))
-			onCreateFirstTime();
+		if (no(state)) onCreateFirstTime();
 		else onCreateRestore(state);
 		created = true;
 		paused = No;
@@ -235,17 +223,17 @@ public abstract class ViewController extends Widget<View> implements IActivityWi
 	protected void onCreateRestore(Bundle state) {
 	}
 
-	protected void onDestroy() {
+	public void onDestroy() {
 		destroyed = true;
 		setActivity(null);
 		setView(null);
-		fire(eventDestroy);
+		fire(onDestroy);
 	}
 
 	protected void onPause() {
 		resumed = false;
 		paused = true;
-		fire(eventPause);
+		fire(onPause);
 	}
 
 	/**
@@ -254,23 +242,23 @@ public abstract class ViewController extends Widget<View> implements IActivityWi
 	protected void onResume() {
 		resumed = true;
 		paused = false;
-		fire(eventResume);
+		fire(onResume);
 	}
 
 	protected void onSaveInstanceState(Bundle state) {
-		fire(eventSaveInstance, state);
+		fire(onSaveInstance, state);
 	}
 
 	protected void onStart() {
 		resumed = true;
 		paused = false;
-		fire(eventStart);
+		fire(onStart);
 	}
 
 	protected void onStop() {
 		resumed = false;
 		state = null;
-		fire(eventStop);
+		fire(onStop);
 	}
 
 	protected void overridePendingTransition(int in, int out) {
@@ -301,8 +289,7 @@ public abstract class ViewController extends Widget<View> implements IActivityWi
 		switchActivity(new Intent(activity(), activityClass));
 	}
 
-	public void switchActivity(Class<? extends Activity> activityClass, String key,
-			Serializable value) {
+	public void switchActivity(Class<? extends Activity> activityClass, String key, Serializable value) {
 		Intent intent = new Intent(activity(), activityClass);
 		intent.putExtra(key, value);
 		switchActivity(intent);
@@ -319,37 +306,54 @@ public abstract class ViewController extends Widget<View> implements IActivityWi
 	}
 
 	public void listenParent() {
-		if (is(parent))
-			parentEventsTask = new Task(parent.getOnCreate(), parent.getOnStart(), parent.getOnResume(),
-					parent.getOnPause(), parent.getOnStop(), parent.getOnSaveInstance(),
-					parent.getOnDestroy(), parent.getOnBack(), parent.getOnActivityResult()) {
-				@Override @SuppressWarnings("unchecked") public void run() {
-					if (event == parent.getOnCreate()) onCreate((Bundle) argument);
-					if (event == parent.getOnStart()) onStart();
-					if (event == parent.getOnResume()) onResume();
-					if (event == parent.getOnPause()) onPause();
-					if (event == parent.getOnStop()) onStop();
-					if (event == parent.getOnSaveInstance()) onSaveInstanceState((Bundle) argument);
-					if (event == parent.getOnDestroy()) onDestroy();
-					if (event == parent.getOnBack()) onBackPressed((Value<Boolean>) argument);
-					if (event == parent.getOnActivityResult()) {
-						ActivityResult result = (ActivityResult) argument;
-						onActivityResult(result.requestCode, result.resultCode, result.data);
-					}
+		if (is(_parent))
+			parentEventsTask = new Task(_parent.onCreate, _parent.onStart, _parent.onResume,
+					_parent.onPause, _parent.onStop, _parent.onSaveInstance, _parent.onDestroy,
+					_parent.onBack, _parent.onActivityResult, _parent.onCreateOptionsMenu,
+					_parent.onOptionsItemSelected, _parent.onPrepareOptionsMenu) {
+				@SuppressWarnings("unchecked") public void run() {
+					if (event == _parent.onCreate) onCreate((Bundle) argument);
+					if (event == _parent.onStart) onStart();
+					if (event == _parent.onResume) onResume();
+					if (event == _parent.onPause) onPause();
+					if (event == _parent.onStop) onStop();
+					if (event == _parent.onSaveInstance) onSaveInstanceState((Bundle) argument);
+					if (event == _parent.onDestroy) onDestroy();
+					if (event == _parent.onBack) onBackPressed((Value<Boolean>) argument);
+					if (event == _parent.onActivityResult) onActivityResult((ActivityResult) argument);
+					if (event == _parent.onCreateOptionsMenu) onCreateOptionsMenu((OnMenu) argument);
+					if (event == _parent.onOptionsItemSelected) onOptionsItemSelected((OnMenuItem) argument);
+					if (event == _parent.onPrepareOptionsMenu) onPrepareOptionsMenu((OnMenu) argument);
 				}
 			};
 	}
 
-	protected boolean onCreateOptionsMenu(Menu menu) {
-		return false;
+	public void onCreateOptionsMenu(OnMenu menu) {
+		fire(onCreateOptionsMenu, menu);
 	}
 
-	protected boolean onOptionsItemSelected(MenuItem item) {
-		return false;
+	public void onOptionsItemSelected(OnMenuItem item) {
+		fire(onOptionsItemSelected, item);
 	}
 
-	public boolean onPrepareOptionsMenu(Menu menu) {
-		// TODO Auto-generated method stub
-		return false;
+	public void onPrepareOptionsMenu(OnMenu menu) {
+		fire(onPrepareOptionsMenu, menu);
 	}
+
+	public FragmentManager getFragmentManager() {
+		return ((CSActivity) activity()).getSupportFragmentManager();
+	}
+
+	public ActionBar getActionBar() {
+		return ((CSActivity) activity()).getSupportActionBar();
+	}
+
+	public MenuInflater getMenuInflater() {
+		return ((CSActivity) activity()).getSupportMenuInflater();
+	}
+
+	public void invalidateOptionsMenu() {
+		((CSActivity) activity()).supportInvalidateOptionsMenu();
+	}
+
 }

@@ -1,7 +1,6 @@
 package cs.android.viewbase;
 
 import android.widget.ViewAnimator;
-import cs.android.IActivityWidget;
 import cs.android.R;
 
 public class AnimatorActivityViewer extends ViewController {
@@ -13,7 +12,7 @@ public class AnimatorActivityViewer extends ViewController {
 	private int nextIn = R.anim.right_to_center;
 	private int nextOut = R.anim.center_to_left;
 
-	public AnimatorActivityViewer(IActivityWidget parent, int viewAnimatorId) {
+	public AnimatorActivityViewer(ViewController parent, int viewAnimatorId) {
 		super(parent, viewAnimatorId);
 		this.viewAnimatorId = viewAnimatorId;
 	}
@@ -23,6 +22,7 @@ public class AnimatorActivityViewer extends ViewController {
 			setNextAnimation();
 		else setBackAnimation();
 		currentView.onDeinitialize(getState());
+		currentView.onDestroy();
 		setCurrentView(view);
 		currentView.onInitialize(null);
 		getAnimator().setDisplayedChild(1);

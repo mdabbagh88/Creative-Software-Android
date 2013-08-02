@@ -32,9 +32,4 @@ public class MultiResponse extends Response<Void> {
 		if (is(_addedRequest)) _addedRequest.cancel();
 	}
 
-	@Override public void failed(String message) {
-		// TODO Auto-generated method stub
-		super.failed(message);
-	}
-	
 }

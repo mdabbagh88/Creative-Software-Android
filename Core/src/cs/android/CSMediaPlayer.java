@@ -9,11 +9,11 @@ public class CSMediaPlayer extends ViewController {
 	private int resource;
 	private MediaPlayer mediaPlayer;
 
-	public CSMediaPlayer(IActivityWidget parent) {
+	public CSMediaPlayer(ViewController parent) {
 		super(parent);
 	}
 
-	public CSMediaPlayer(IActivityWidget parent, int resource) {
+	public CSMediaPlayer(ViewController parent, int resource) {
 		super(parent);
 		this.resource = resource;
 	}

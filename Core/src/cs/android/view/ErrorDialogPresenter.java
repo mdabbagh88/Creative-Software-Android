@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Bundle;
-import cs.android.IActivityWidget;
 import cs.android.lang.AndroidLang;
 import cs.android.viewbase.ViewController;
 import cs.java.lang.Factory;
@@ -22,7 +21,7 @@ public class ErrorDialogPresenter extends ViewController implements Factory<Dial
 	private final int mailActivityChooserTitle;
 	private final int sendButtonText;
 
-	public ErrorDialogPresenter(IActivityWidget hasActivity, int sendButtonText, String supportMail,
+	public ErrorDialogPresenter(ViewController hasActivity, int sendButtonText, String supportMail,
 			int emailTitle, int mailActivityChooserTitle) {
 		super(hasActivity);
 		errorDialogPresenter.setDialogFactory(this);
@@ -32,13 +31,11 @@ public class ErrorDialogPresenter extends ViewController implements Factory<Dial
 		this.mailActivityChooserTitle = mailActivityChooserTitle;
 	}
 
-	 @Override
-	public Dialog create() {
+	@Override public Dialog create() {
 		Builder builder = new Builder(activity());
 		builder.setMessage(dialogTitleId);
 		builder.setPositiveButton(sendButtonText, new OnClickListener() {
-			@Override
-			public void onClick(DialogInterface arg0, int arg1) {
+			@Override public void onClick(DialogInterface arg0, int arg1) {
 				onSendButonClick();
 			}
 		});

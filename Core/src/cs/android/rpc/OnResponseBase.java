@@ -1,6 +1,6 @@
 package cs.android.rpc;
 
-import cs.android.IActivityWidget;
+import cs.android.viewbase.ViewController;
 import cs.java.event.Event;
 import cs.java.event.Event.EventRegistration;
 import cs.java.event.Listener;
@@ -8,11 +8,11 @@ import cs.java.lang.Run;
 
 public abstract class OnResponseBase<Data> implements Run, Listener {
 
-	private final IActivityWidget onRequestParent;
+	private final ViewController onRequestParent;
 	private Response<Data> response;
 	private EventRegistration registration;
 
-	public OnResponseBase(IActivityWidget parent, Response<Data> response) {
+	public OnResponseBase(ViewController parent, Response<Data> response) {
 		onRequestParent = parent;
 		this.response = response;
 	}

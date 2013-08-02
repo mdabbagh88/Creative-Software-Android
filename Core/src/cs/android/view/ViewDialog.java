@@ -5,15 +5,14 @@ import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
-import cs.android.IActivityWidget;
-import cs.android.viewbase.ViewController;
 import cs.android.viewbase.IsView;
+import cs.android.viewbase.ViewController;
 
 public class ViewDialog extends ViewController {
 
 	private Dialog dialog;
 
-	public ViewDialog(IActivityWidget hasActivity) {
+	public ViewDialog(ViewController hasActivity) {
 		super(hasActivity);
 	}
 
@@ -22,8 +21,7 @@ public class ViewDialog extends ViewController {
 		builder.setView(view.asView());
 		dialog = builder.create();
 		dialog.setOnDismissListener(new OnDismissListener() {
-			@Override
-			public void onDismiss(DialogInterface dialog) {
+			@Override public void onDismiss(DialogInterface dialog) {
 				onDialogDissmiss();
 			}
 		});

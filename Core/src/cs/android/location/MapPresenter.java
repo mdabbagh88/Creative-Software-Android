@@ -8,7 +8,7 @@ import android.widget.ImageView;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapView;
 
-import cs.android.IActivityWidget;
+
 import cs.android.viewbase.ViewController;
 
 public class MapPresenter extends ViewController {
@@ -16,7 +16,7 @@ public class MapPresenter extends ViewController {
 	private final int mapFrameId;
 	private final HasMap hasMap;
 
-	public MapPresenter(IActivityWidget parent, HasMap hasMap, int mapFrameId) {
+	public MapPresenter(ViewController parent, HasMap hasMap, int mapFrameId) {
 		super(parent);
 		this.hasMap = hasMap;
 		this.mapFrameId = mapFrameId;

@@ -7,6 +7,7 @@ import static cs.java.lang.Lang.doLater;
 import static cs.java.lang.Lang.error;
 import static cs.java.lang.Lang.fire;
 import static cs.java.lang.Lang.is;
+import android.app.Activity;
 import cs.android.viewbase.ContextPresenter;
 import cs.java.event.Event;
 import cs.java.lang.Run;
@@ -25,8 +26,17 @@ public class Response<Data> extends ContextPresenter {
 	protected Data _data;
 	private boolean _canceled;
 	private Url url;
+	private Activity _activity;
 
 	public Response() {
+	}
+
+	protected Activity activity() {
+		return _activity;
+	}
+
+	public void activity(Activity activity) {
+		_activity = activity;
 	}
 
 	public Response(Url url) {
@@ -34,8 +44,7 @@ public class Response<Data> extends ContextPresenter {
 	}
 
 	public void cancel() {
-		if (_canceled)
-			return;
+		if (_canceled) return;
 		_canceled = Yes;
 		onDone();
 	}
@@ -57,8 +66,7 @@ public class Response<Data> extends ContextPresenter {
 	public void failed(final Exception e, String message) {
 		error(e);
 		_exceptionMessage = message;
-		if (is(e))
-			_exceptionDetails = createTraceString(e) + e.getMessage();
+		if (is(e)) _exceptionDetails = createTraceString(e) + e.getMessage();
 		onFailed(this);
 		onDone();
 	}
@@ -89,8 +97,6 @@ public class Response<Data> extends ContextPresenter {
 	public Event<Response<Data>> getOnDone() {
 		return _onDone;
 	}
-	
-	
 
 	public Event<Response<?>> getOnFailed() {
 		return _onFailed;
@@ -117,26 +123,21 @@ public class Response<Data> extends ContextPresenter {
 	}
 
 	public void onDone() {
-		if (_done)
-			return;
+		if (_done) return;
 		_done = true;
 		fire(_onDone, Response.this);
 	}
 
 	public void onFailed(Response<?> request) {
-		if (_canceled)
-			return;
-		if (_failed)
-			return;
+		if (_canceled) return;
+		if (_failed) return;
 		_failed = true;
 		fire(_onFailed, request);
 	}
 
 	public void onSuccess() {
-		if (_canceled)
-			return;
-		if (_success)
-			return;
+		if (_canceled) return;
+		if (_success) return;
 		_success = Yes;
 		fire(_onSuccess, Response.this);
 	}
@@ -167,7 +168,7 @@ public class Response<Data> extends ContextPresenter {
 		onSuccess();
 		onDone();
 	}
-	
+
 	public void successLater() {
 		doLater(new Run() {
 			public void run() {
@@ -175,6 +176,5 @@ public class Response<Data> extends ContextPresenter {
 			}
 		});
 	}
-
 
 }

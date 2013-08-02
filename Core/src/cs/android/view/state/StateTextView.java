@@ -1,6 +1,5 @@
 package cs.android.view.state;
 
-import cs.android.IActivityWidget;
 import cs.android.viewbase.ViewController;
 
 public class StateTextView extends ViewController {
@@ -8,7 +7,7 @@ public class StateTextView extends ViewController {
 	private final int viewId;
 	private String textValue = "";
 
-	public StateTextView(IActivityWidget parent, int viewId) {
+	public StateTextView(ViewController parent, int viewId) {
 		super(parent);
 		this.viewId = viewId;
 	}

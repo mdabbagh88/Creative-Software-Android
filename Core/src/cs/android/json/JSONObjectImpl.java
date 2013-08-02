@@ -37,7 +37,7 @@ public class JSONObjectImpl extends JsonObjectImplBase {
 	public Boolean getBoolean(String key, Boolean defaultValue) {
 		Boolean value = getBoolean(key);
 		if (no(value)) return defaultValue;
-		return defaultValue;
+		return value;
 	}
 
 	@Override public JSONType getImpl(String key) {
@@ -53,7 +53,7 @@ public class JSONObjectImpl extends JsonObjectImplBase {
 	public Integer getInteger(String key, Integer defaultValue) {
 		Integer value = getInteger(key);
 		if (no(value)) return defaultValue;
-		return defaultValue;
+		return value;
 	}
 
 	@Override public int getSize() {

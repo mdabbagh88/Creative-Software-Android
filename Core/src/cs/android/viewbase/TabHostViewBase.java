@@ -8,12 +8,11 @@ import static cs.java.lang.Lang.no;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.CompoundButton;
-import cs.android.IActivityWidget;
 import cs.android.view.OnClick;
 import cs.java.collections.List;
 import cs.java.event.Event;
 
-public class TabHostViewBase extends ViewController implements TabHostView {
+public class TabHostViewBase extends ViewController {
 
 	private class Tab {
 
@@ -32,14 +31,13 @@ public class TabHostViewBase extends ViewController implements TabHostView {
 	private final List<Tab> tabs = list();
 	private static final String INDEX_STATE_KEY = "index_state_key";
 
-	@Override
 	public AnimatorActivityViewer viewer() {
 		return viewer;
 	}
 
 	private Integer currentIndex;
 
-	public TabHostViewBase(IActivityWidget parent, int layoutId, int animatorId) {
+	public TabHostViewBase(ViewController parent, int layoutId, int animatorId) {
 		super(parent, layout(layoutId));
 		viewer = new AnimatorActivityViewer(this, animatorId);
 	}
@@ -53,7 +51,6 @@ public class TabHostViewBase extends ViewController implements TabHostView {
 		tabs.add(new Tab(tabViewId, screen));
 	}
 
-	@Override
 	public void displayView(int index) {
 		CompoundButton currentTabView = getCompoundButton(tabs.get(currentIndex).tabViewId);
 		currentTabView.setClickable(true);
@@ -65,22 +62,18 @@ public class TabHostViewBase extends ViewController implements TabHostView {
 		onTabChange(index);
 	}
 
-	@Override
-	public IActivityWidget getCurrentView() {
+	public ViewController getCurrentView() {
 		return viewer.getCurrentView();
 	}
 
-	@Override
 	public int getCurrentViewIndex() {
 		return currentIndex;
 	}
 
-	@Override
 	public Event<Integer> getOnViewChange() {
 		return onViewChange;
 	}
 
-	@Override
 	public int getStartViewIndex() {
 		return 0;
 	}
@@ -93,12 +86,12 @@ public class TabHostViewBase extends ViewController implements TabHostView {
 		if (currentIndex > 0) displayView(currentIndex - 1);
 	}
 
-	@Override protected void onCreate() {
+	protected void onCreate() {
 		setTabClickListeners();
 		super.onCreate();
 	}
 
-	@Override protected void onCreate(Bundle state) {
+	protected void onCreate(Bundle state) {
 		if (no(currentIndex)) {
 			if (is(state))
 				currentIndex = state.getInt(INDEX_STATE_KEY);
@@ -109,7 +102,7 @@ public class TabHostViewBase extends ViewController implements TabHostView {
 		super.onCreate(state);
 	}
 
-	@Override protected void onSaveInstanceState(Bundle state) {
+	protected void onSaveInstanceState(Bundle state) {
 		super.onSaveInstanceState(state);
 		state.putInt(INDEX_STATE_KEY, currentIndex);
 	}
@@ -136,7 +129,6 @@ public class TabHostViewBase extends ViewController implements TabHostView {
 		for (int i = 0; i < tabs.size(); i++) {
 			final int index = i;
 			new OnClick(this, tabs.get(i).tabViewId) {
-				@Override
 				public void onClick(View v) {
 					onTabClick(index);
 				}

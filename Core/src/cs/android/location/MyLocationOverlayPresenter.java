@@ -5,7 +5,7 @@ import static cs.java.lang.Lang.is;
 import com.google.android.maps.MapView;
 import com.google.android.maps.MyLocationOverlay;
 
-import cs.android.IActivityWidget;
+
 import cs.android.viewbase.ViewController;
 import cs.java.lang.Run;
 
@@ -15,7 +15,7 @@ public class MyLocationOverlayPresenter extends ViewController {
 	private final HasMap hasMap;
 	private MapView map;
 
-	public MyLocationOverlayPresenter(IActivityWidget parent, HasMap hasMap) {
+	public MyLocationOverlayPresenter(ViewController parent, HasMap hasMap) {
 		super(parent);
 		this.hasMap = hasMap;
 	}

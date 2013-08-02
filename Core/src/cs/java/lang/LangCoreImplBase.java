@@ -2,6 +2,7 @@ package cs.java.lang;
 
 import static cs.java.lang.Lang.is;
 import static cs.java.lang.Lang.iterate;
+import static cs.java.lang.Lang.no;
 import static cs.java.lang.Lang.string;
 import static cs.java.lang.Lang.text;
 
@@ -20,8 +21,8 @@ public abstract class LangCoreImplBase implements LangCore {
 				"(" + element.getFileName(), ":", element.getLineNumber(), ")").toString();
 	}
 
-	@Override
-	public String createTraceString(Throwable throwable) {
+	@Override public String createTraceString(Throwable throwable) {
+		if (no(throwable)) return "";
 		Text text = text();
 		if (is(throwable.getMessage()))
 			text.add(throwable.getMessage()).addLine();

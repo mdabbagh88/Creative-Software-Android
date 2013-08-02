@@ -9,13 +9,12 @@ import static cs.java.lang.Lang.no;
 import java.util.ArrayList;
 
 import android.os.Bundle;
-import cs.android.IActivityWidget;
 import cs.java.collections.List;
 import cs.java.collections.Map;
 import cs.java.event.Event;
 import cs.java.lang.Value;
 
-public abstract class ScreenHostViewBase extends ViewController implements ScreenHostView {
+public abstract class ScreenHostViewBase extends ViewController {
 
 	private final Event<String> onViewChange = event();
 	private final AnimatorActivityViewer viewer = new AnimatorActivityViewer(this, getAnimatorId());
@@ -32,14 +31,14 @@ public abstract class ScreenHostViewBase extends ViewController implements Scree
 		screenFactories.put(id, screen);
 	}
 
-	@Override
 	public void clearHistory() {
 		String lastViewId = viewHistory.last();
 		viewHistory.clear();
 		viewHistory.add(getStartViewId(), lastViewId);
 	}
 
-	@Override
+	protected abstract String getStartViewId();
+
 	public void displayNextView(String screenId) {
 		if (viewHistory.contains(screenId)) {
 			int viewIndex = viewHistory.getIndex(screenId);
@@ -49,22 +48,19 @@ public abstract class ScreenHostViewBase extends ViewController implements Scree
 		onScreenChange(screenId);
 	}
 
-	@Override
-	public IActivityWidget getCurrentView() {
+	public ViewController getCurrentView() {
 		return viewer.getCurrentView();
 	}
 
-	@Override
 	public String getCurrentViewId() {
 		return currentScreenId;
 	}
 
-	@Override
 	public Event<String> getOnViewChange() {
 		return onViewChange;
 	}
 
-	@Override public void goBack() {
+	public void goBack() {
 		viewHistory.removeLast();
 		viewer.displayView(createView(viewHistory.last()), false);
 		currentScreenId = viewHistory.last();
@@ -75,7 +71,7 @@ public abstract class ScreenHostViewBase extends ViewController implements Scree
 		return getStartViewId() == getCurrentViewId();
 	}
 
-	@Override public void onBackPressed(Value<Boolean> goBack) {
+	public void onBackPressed(Value<Boolean> goBack) {
 		super.onBackPressed(goBack);
 		if (goBack.get()) if (viewHistory.size() > 1) {
 			goBack();
@@ -85,7 +81,7 @@ public abstract class ScreenHostViewBase extends ViewController implements Scree
 
 	protected abstract int getAnimatorId();
 
-	@Override protected void onCreate(Bundle state) {
+	protected void onCreate(Bundle state) {
 		if (viewHistory.isEmpty()) {
 			if (no(state))
 				viewHistory.add(getStartViewId());
@@ -95,7 +91,7 @@ public abstract class ScreenHostViewBase extends ViewController implements Scree
 		super.onCreate(state);
 	}
 
-	@SuppressWarnings("unchecked") @Override protected void onSaveInstanceState(Bundle state) {
+	@SuppressWarnings("unchecked") protected void onSaveInstanceState(Bundle state) {
 		super.onSaveInstanceState(state);
 		state.putStringArrayList(HISTORY_STATE_KEY, (ArrayList<String>) viewHistory);
 	}

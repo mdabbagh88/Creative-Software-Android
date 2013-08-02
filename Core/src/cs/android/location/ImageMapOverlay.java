@@ -7,7 +7,7 @@ import com.google.android.maps.GeoPoint;
 import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.OverlayItem;
 
-import cs.android.IActivityWidget;
+import cs.android.viewbase.ViewController;
 
 public class ImageMapOverlay extends ItemizedOverlay<OverlayItem> {
 
@@ -15,7 +15,7 @@ public class ImageMapOverlay extends ItemizedOverlay<OverlayItem> {
 	private String title = "";
 	private String snipet = "";
 
-	public ImageMapOverlay(IActivityWidget activity, int drawable) {
+	public ImageMapOverlay(ViewController activity, int drawable) {
 		super(boundCenterBottom(getDrawable(activity, drawable)));
 	}
 

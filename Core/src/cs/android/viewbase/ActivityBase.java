@@ -4,50 +4,31 @@ import static cs.java.lang.Lang.no;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
-import android.view.Display;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuItem;
+
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+
 import cs.java.lang.Value;
 
-public abstract class ActivityBase extends Activity implements IsActivityBase {
+public abstract class ActivityBase extends SherlockFragmentActivity implements CSActivity {
 
 	private ActivityManager manager;
 	private ViewController presenter;
 
-	@Override
-	public Activity activity() {
+	@Override public Activity activity() {
 		return this;
-	}
-
-	public int getScreenOrientation() {
-		Display getOrient = getWindowManager().getDefaultDisplay();
-		int orientation = Configuration.ORIENTATION_UNDEFINED;
-		if (getOrient.getWidth() == getOrient.getHeight()) {
-			orientation = Configuration.ORIENTATION_SQUARE;
-		} else {
-			if (getOrient.getWidth() < getOrient.getHeight()) {
-				orientation = Configuration.ORIENTATION_PORTRAIT;
-			} else {
-				orientation = Configuration.ORIENTATION_LANDSCAPE;
-			}
-		}
-		return orientation;
 	}
 
 	public void activityOnBackPressed() {
 		super.onBackPressed();
 	}
 
-	@Override
-	public Context context() {
+	@Override public Context context() {
 		return this;
 	}
 
-	@Override
-	public ViewController getPresenter() {
+	@Override public ViewController getPresenter() {
 		return presenter;
 	}
 
@@ -76,7 +57,11 @@ public abstract class ActivityBase extends Activity implements IsActivityBase {
 		return super.onKeyDown(keyCode, event);
 	}
 
-	@Override public Object onRetainNonConfigurationInstance() {
+	@Override public Object getSavedInstance() {
+		return getLastCustomNonConfigurationInstance();
+	}
+
+	@Override public Object onRetainCustomNonConfigurationInstance() {
 		return presenter;
 	}
 
@@ -85,7 +70,7 @@ public abstract class ActivityBase extends Activity implements IsActivityBase {
 	}
 
 	@Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		presenter.onActivityResult(requestCode, resultCode, data);
+		presenter.onActivityResult(new ActivityResult(requestCode, resultCode, data));
 		super.onActivityResult(requestCode, resultCode, data);
 	}
 
@@ -113,16 +98,23 @@ public abstract class ActivityBase extends Activity implements IsActivityBase {
 		presenter.onStop();
 		super.onStop();
 	}
-	
-	@Override public boolean onCreateOptionsMenu(Menu menu) {
-		return presenter.onCreateOptionsMenu(menu);
-	}
-	
-	@Override public boolean onOptionsItemSelected(MenuItem item) {
-		return presenter.onOptionsItemSelected(item);
+
+	public boolean onCreateOptionsMenu(com.actionbarsherlock.view.Menu menu) {
+		OnMenu onMenu = new OnMenu(menu);
+		presenter.onCreateOptionsMenu(onMenu);
+		return onMenu.result.get();
 	}
 
-	@Override public boolean onPrepareOptionsMenu(Menu menu) {
-		return presenter.onPrepareOptionsMenu(menu);
+	public boolean onOptionsItemSelected(com.actionbarsherlock.view.MenuItem item) {
+		OnMenuItem onMenuItem = new OnMenuItem(item);
+		presenter.onOptionsItemSelected(onMenuItem);
+		return onMenuItem.result.get();
 	}
+
+	public boolean onPrepareOptionsMenu(com.actionbarsherlock.view.Menu menu) {
+		OnMenu onMenu = new OnMenu(menu);
+		presenter.onPrepareOptionsMenu(onMenu);
+		return onMenu.result.get();
+	}
+
 }
