@@ -17,10 +17,18 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
 import java.util.TimeZone;
 
+import android.app.Activity;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.pm.Signature;
 import android.graphics.drawable.Drawable;
+import android.util.Base64;
 import android.view.View;
 import android.view.ViewGroup;
 import cs.android.BuildConfig;
@@ -46,12 +54,9 @@ public class AndroidLang {
 	}
 
 	public static boolean androidMinimum(int verCode) {
-		if (android.os.Build.VERSION.RELEASE.startsWith("1.0"))
-			return verCode == 1;
-		else if (android.os.Build.VERSION.RELEASE.startsWith("1.1"))
-			return verCode <= 2;
-		else if (android.os.Build.VERSION.RELEASE.startsWith("1.5"))
-			return verCode <= 3;
+		if (android.os.Build.VERSION.RELEASE.startsWith("1.0")) return verCode == 1;
+		else if (android.os.Build.VERSION.RELEASE.startsWith("1.1")) return verCode <= 2;
+		else if (android.os.Build.VERSION.RELEASE.startsWith("1.5")) return verCode <= 3;
 		else return android.os.Build.VERSION.SDK_INT >= verCode;
 	}
 
@@ -193,6 +198,22 @@ public class AndroidLang {
 			return URLEncoder.encode(argument, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			throw exception(e);
+		}
+	}
+
+	public static void printAppKeyHash(Activity activity) {
+		try {
+			PackageInfo info = activity.getPackageManager().getPackageInfo("cs.rcherz",
+					PackageManager.GET_SIGNATURES);
+			for (Signature signature : info.signatures) {
+				MessageDigest md = MessageDigest.getInstance("SHA");
+				md.update(signature.toByteArray());
+				info("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+			}
+		} catch (NameNotFoundException e) {
+			error(e);
+		} catch (NoSuchAlgorithmException e) {
+			error(e);
 		}
 	}
 

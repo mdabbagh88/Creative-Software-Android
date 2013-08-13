@@ -16,16 +16,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.view.Display;
 import android.view.View;
-import android.view.WindowManager.LayoutParams;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.MenuInflater;
 
+import cs.android.lang.DoLater;
 import cs.java.event.Event;
 import cs.java.event.Task;
 import cs.java.lang.Value;
@@ -36,6 +35,7 @@ public abstract class ViewController extends Widget<View> {
 	private Bundle state;
 	public final Event<Void> onPause = event();
 	public final Event<Bundle> onCreate = event();
+	public final Event<Bundle> onBeforeCreate = event();
 	public final Event<Value<Boolean>> onBack = event();
 	public final Event<Void> onStart = event();
 	public final Event<Void> onStop = event();
@@ -46,19 +46,28 @@ public abstract class ViewController extends Widget<View> {
 	public final Event<OnMenuItem> onOptionsItemSelected = event();
 	public final Event<OnMenu> onCreateOptionsMenu = event();
 	public final Event<ActivityResult> onActivityResult = event();
+	public final Event<OnKeyDownResult> onKeyDown = event();
 	private Task parentEventsTask;
 	private boolean created;
 	private boolean resumed;
 	private boolean paused;
 	private boolean destroyed;
-	protected final ViewController _parent;
+	private final ViewController _parent;
 	private int viewId;
-	private LayoutId layoutId;
-	public static ViewController root;
+	private LayoutId _layoutId;
+	private static ViewController _root;
+
+	public boolean hasLayout() {
+		return is(_layoutId);
+	}
 
 	public ViewController(ViewController parent) {
-		this._parent = parent;
+		_parent = parent;
 		listenParent();
+	}
+
+	public static ViewController root() {
+		return _root;
 	}
 
 	public FragmentManager getSupportFragmentManager() {
@@ -68,7 +77,7 @@ public abstract class ViewController extends Widget<View> {
 	}
 
 	public ViewController(ViewController parent, int viewId) {
-		this._parent = parent;
+		_parent = parent;
 		this.viewId = viewId;
 		listenParent();
 	}
@@ -76,28 +85,31 @@ public abstract class ViewController extends Widget<View> {
 	@SuppressWarnings("deprecation") public int getScreenOrientation() {
 		Display getOrient = activity().getWindowManager().getDefaultDisplay();
 		int orientation = Configuration.ORIENTATION_UNDEFINED;
-		if (getOrient.getWidth() == getOrient.getHeight()) {
-			orientation = Configuration.ORIENTATION_SQUARE;
-		} else {
-			if (getOrient.getWidth() < getOrient.getHeight()) {
-				orientation = Configuration.ORIENTATION_PORTRAIT;
-			} else {
-				orientation = Configuration.ORIENTATION_LANDSCAPE;
-			}
-		}
+		if (getOrient.getWidth() == getOrient.getHeight()) orientation = Configuration.ORIENTATION_SQUARE;
+		else if (getOrient.getWidth() < getOrient.getHeight()) orientation = Configuration.ORIENTATION_PORTRAIT;
+		else orientation = Configuration.ORIENTATION_LANDSCAPE;
 		return orientation;
 	}
 
+	public View findViewUp(int id) {
+		View view = null;
+		ViewController parent = parent();
+		while (parent != null && (view = parent.getViewGroup(id)) == null)
+			parent = parent().getParent();
+		return view;
+	}
+
 	public ViewController(ViewController parent, LayoutId id) {
-		this._parent = parent;
-		layoutId = id;
+		_parent = parent;
+		_layoutId = id;
+		_root = null;
 		listenParent();
 	}
 
 	public ViewController(LayoutId layoutId) {
-		this.layoutId = layoutId;
+		_layoutId = layoutId;
 		_parent = null;
-		root = this;
+		_root = this;
 		listenParent();
 	}
 
@@ -108,10 +120,10 @@ public abstract class ViewController extends Widget<View> {
 	public View asView() {
 		if (is(getView())) return getView();
 		else if (set(viewId)) {
-			setView(_parent.asView().findViewById(viewId));
-			if (no(getView())) throw unexpected("Expected", this, "in parent", _parent);
-		} else if (set(layoutId)) setView(inflateLayout(layoutId.value));
-		else setView(_parent.asView());
+			setView(parent().asView().findViewById(viewId));
+			if (no(getView())) throw unexpected("Expected", this, "in parent", parent());
+		} else if (set(_layoutId)) setView(inflateLayout(_layoutId.value));
+		else setView(parent().asView());
 		return getView();
 	}
 
@@ -124,7 +136,7 @@ public abstract class ViewController extends Widget<View> {
 	}
 
 	public Context context() {
-		if (is(_parent)) return _parent.context();
+		if (is(parent())) return parent().context();
 		return super.context();
 	}
 
@@ -146,6 +158,11 @@ public abstract class ViewController extends Widget<View> {
 
 	public void onBackPressed(Value<Boolean> goBack) {
 		fire(onBack, goBack);
+		new DoLater(200) {
+			public void run() {
+				hideSoftInput(0);
+			}
+		};
 	}
 
 	public void onDeinitialize(Bundle state) {
@@ -156,6 +173,7 @@ public abstract class ViewController extends Widget<View> {
 	}
 
 	public void onInitialize(Bundle state) {
+		onBeforeCreate(state);
 		onCreate(state);
 		onStart();
 		onResume();
@@ -172,7 +190,7 @@ public abstract class ViewController extends Widget<View> {
 	}
 
 	public void goBack() {
-		if (is(_parent)) _parent.goBack();
+		if (is(parent())) parent().goBack();
 		else activity().onBackPressed();
 	}
 
@@ -195,13 +213,6 @@ public abstract class ViewController extends Widget<View> {
 	}
 
 	protected void onCreate(Bundle state) {
-		if (is(_parent)) setActivity(_parent.activity());
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-			activity().getWindow().setFlags(LayoutParams.FLAG_HARDWARE_ACCELERATED,
-					LayoutParams.FLAG_HARDWARE_ACCELERATED);
-		// overridePendingTransition(R.anim.right_to_center, R.anim.center_to_left);
-
 		this.state = state;
 		fire(onCreate, state);
 		onCreate();
@@ -306,24 +317,28 @@ public abstract class ViewController extends Widget<View> {
 	}
 
 	public void listenParent() {
-		if (is(_parent))
-			parentEventsTask = new Task(_parent.onCreate, _parent.onStart, _parent.onResume,
-					_parent.onPause, _parent.onStop, _parent.onSaveInstance, _parent.onDestroy,
-					_parent.onBack, _parent.onActivityResult, _parent.onCreateOptionsMenu,
-					_parent.onOptionsItemSelected, _parent.onPrepareOptionsMenu) {
+		if (is(parent()))
+			parentEventsTask = new Task(parent().onBeforeCreate, parent().onCreate, parent().onStart,
+					parent().onResume, parent().onPause, parent().onStop, parent().onSaveInstance,
+					parent().onDestroy, parent().onBack, parent().onActivityResult,
+					parent().onCreateOptionsMenu, parent().onOptionsItemSelected,
+					parent().onPrepareOptionsMenu, parent().onKeyDown) {
 				@SuppressWarnings("unchecked") public void run() {
-					if (event == _parent.onCreate) onCreate((Bundle) argument);
-					if (event == _parent.onStart) onStart();
-					if (event == _parent.onResume) onResume();
-					if (event == _parent.onPause) onPause();
-					if (event == _parent.onStop) onStop();
-					if (event == _parent.onSaveInstance) onSaveInstanceState((Bundle) argument);
-					if (event == _parent.onDestroy) onDestroy();
-					if (event == _parent.onBack) onBackPressed((Value<Boolean>) argument);
-					if (event == _parent.onActivityResult) onActivityResult((ActivityResult) argument);
-					if (event == _parent.onCreateOptionsMenu) onCreateOptionsMenu((OnMenu) argument);
-					if (event == _parent.onOptionsItemSelected) onOptionsItemSelected((OnMenuItem) argument);
-					if (event == _parent.onPrepareOptionsMenu) onPrepareOptionsMenu((OnMenu) argument);
+					if (event == parent().onBeforeCreate) onBeforeCreate((Bundle) argument);
+					else if (event == parent().onCreate) onCreate((Bundle) argument);
+					else if (event == parent().onStart) onStart();
+					else if (event == parent().onResume) onResume();
+					else if (event == parent().onPause) onPause();
+					else if (event == parent().onStop) onStop();
+					else if (event == parent().onSaveInstance) onSaveInstanceState((Bundle) argument);
+					else if (event == parent().onDestroy) onDestroy();
+					else if (event == parent().onBack) onBackPressed((Value<Boolean>) argument);
+					else if (event == parent().onActivityResult) onActivityResult((ActivityResult) argument);
+					else if (event == parent().onCreateOptionsMenu) onCreateOptionsMenu((OnMenu) argument);
+					else if (event == parent().onOptionsItemSelected) onOptionsItemSelected((OnMenuItem) argument);
+					else if (event == parent().onPrepareOptionsMenu) onPrepareOptionsMenu((OnMenu) argument);
+					else if (event == parent().onKeyDown) onKeyDown((OnKeyDownResult) argument);
+					else throw unexpected();
 				}
 			};
 	}
@@ -354,6 +369,23 @@ public abstract class ViewController extends Widget<View> {
 
 	public void invalidateOptionsMenu() {
 		((CSActivity) activity()).supportInvalidateOptionsMenu();
+	}
+
+	public void onKeyDown(OnKeyDownResult onKey) {
+		fire(onKeyDown, onKey);
+	}
+
+	public void onBeforeCreate(Bundle state) {
+		if (is(parent())) setActivity(parent().activity());
+		fire(onBeforeCreate, state);
+	}
+
+	public ViewController getParent() {
+		return parent();
+	}
+
+	public ViewController parent() {
+		return _parent;
 	}
 
 }

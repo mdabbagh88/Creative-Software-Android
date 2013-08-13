@@ -58,9 +58,9 @@ public abstract class ContextPresenter extends Base implements HasContext {
 			return null;
 		}
 	}
-	
+
 	public CSQuery aq() {
-		if (no(_aq)) _aq = new CSQuery();
+		if (no(_aq)) _aq = new CSQuery(this);
 		return _aq;
 	}
 

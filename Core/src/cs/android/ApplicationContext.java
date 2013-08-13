@@ -3,6 +3,9 @@ package cs.android;
 import static cs.java.lang.Lang.info;
 import android.app.Application;
 import android.content.Context;
+
+import com.androidquery.callback.BitmapAjaxCallback;
+
 import cs.android.lang.AndroidLangCore;
 import cs.java.lang.Lang;
 
@@ -22,6 +25,7 @@ public class ApplicationContext extends Application {
 
 	@Override public void onLowMemory() {
 		info();
+		BitmapAjaxCallback.clearCache();
 		super.onLowMemory();
 	}
 

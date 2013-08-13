@@ -15,4 +15,8 @@ public abstract class OnFailed<Data> extends OnResponseBase<Data> {
 		this(null, request);
 	}
 
+	protected Response failedReponse() {
+		return _argument;
+	}
+
 }

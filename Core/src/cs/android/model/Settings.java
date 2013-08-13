@@ -1,5 +1,6 @@
 package cs.android.model;
 
+import static cs.java.lang.Lang.empty;
 import static cs.java.lang.Lang.is;
 import static cs.java.lang.Lang.iterate;
 import static cs.java.lang.Lang.json;
@@ -175,7 +176,7 @@ public class Settings extends ContextPresenter {
 
 	private JSONContainer loadJSONContainer(String key) {
 		String loadString = loadString(key);
-		if (no(loadString)) return null;
+		if (empty(loadString)) return null;
 		JSONContainer parsed = json().parse(loadString);
 		return parsed;
 	}

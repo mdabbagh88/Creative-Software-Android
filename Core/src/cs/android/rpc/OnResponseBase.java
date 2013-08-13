@@ -11,6 +11,7 @@ public abstract class OnResponseBase<Data> implements Run, Listener {
 	private final ViewController onRequestParent;
 	private Response<Data> response;
 	private EventRegistration registration;
+	protected Response _argument;
 
 	public OnResponseBase(ViewController parent, Response<Data> response) {
 		onRequestParent = parent;
@@ -26,6 +27,7 @@ public abstract class OnResponseBase<Data> implements Run, Listener {
 	}
 
 	@Override public <T> void onEvent(Event<T> event, EventRegistration registration, T argument) {
+		_argument = (Response) argument;
 		if (onRequestParent == null || !onRequestParent.isPaused()) run();
 	}
 

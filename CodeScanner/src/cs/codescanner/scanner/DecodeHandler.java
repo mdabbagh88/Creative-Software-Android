@@ -20,11 +20,11 @@ import cs.codescanner.scanner.camera.CameraManager;
 
 final class DecodeHandler extends Handler {
 
-	private final CaptureMain activity;
+	private final CaptureMainController activity;
 	private final MultiFormatReader multiFormatReader;
 	private boolean running = true;
 
-	DecodeHandler(CaptureMain activity, Map<DecodeHintType, Object> hints) {
+	DecodeHandler(CaptureMainController activity, Map<DecodeHintType, Object> hints) {
 		multiFormatReader = new MultiFormatReader();
 		multiFormatReader.setHints(hints);
 		this.activity = activity;

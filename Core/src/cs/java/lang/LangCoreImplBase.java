@@ -24,11 +24,10 @@ public abstract class LangCoreImplBase implements LangCore {
 	@Override public String createTraceString(Throwable throwable) {
 		if (no(throwable)) return "";
 		Text text = text();
-		if (is(throwable.getMessage()))
-			text.add(throwable.getMessage()).addLine();
+		if (is(throwable.getMessage())) text.add(throwable.getMessage()).addLine();
 		else text.addLine();
 
-		for (StackTraceElement element : iterate(throwable.getStackTrace()).skip(1))
+		for (StackTraceElement element : iterate(throwable.getStackTrace()))
 			text.add(createLogString(element)).addLine();
 
 		return text.toString();

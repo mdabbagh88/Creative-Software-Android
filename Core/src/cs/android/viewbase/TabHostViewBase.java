@@ -1,14 +1,14 @@
 package cs.android.viewbase;
 
 import static cs.android.lang.AndroidLang.event;
+import static cs.java.lang.Lang.empty;
 import static cs.java.lang.Lang.fire;
 import static cs.java.lang.Lang.is;
 import static cs.java.lang.Lang.list;
-import static cs.java.lang.Lang.no;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.CompoundButton;
-import cs.android.view.OnClick;
+import cs.android.view.adapter.OnClick;
 import cs.java.collections.List;
 import cs.java.event.Event;
 
@@ -92,9 +92,8 @@ public class TabHostViewBase extends ViewController {
 	}
 
 	protected void onCreate(Bundle state) {
-		if (no(currentIndex)) {
-			if (is(state))
-				currentIndex = state.getInt(INDEX_STATE_KEY);
+		if (empty(currentIndex)) {
+			if (is(state)) currentIndex = state.getInt(INDEX_STATE_KEY);
 			else currentIndex = getStartViewIndex();
 			viewer.setCurrentView(createCurrentView(currentIndex));
 		} else viewer.setCurrentView(viewer.getCurrentView());

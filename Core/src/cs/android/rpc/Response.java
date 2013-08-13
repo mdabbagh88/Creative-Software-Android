@@ -4,7 +4,9 @@ import static cs.android.lang.AndroidLang.event;
 import static cs.java.lang.Lang.Yes;
 import static cs.java.lang.Lang.createTraceString;
 import static cs.java.lang.Lang.doLater;
+import static cs.java.lang.Lang.empty;
 import static cs.java.lang.Lang.error;
+import static cs.java.lang.Lang.exception;
 import static cs.java.lang.Lang.fire;
 import static cs.java.lang.Lang.is;
 import android.app.Activity;
@@ -19,7 +21,7 @@ public class Response<Data> extends ContextPresenter {
 	private final Event<Response<?>> _onFailed = event();
 	private final Event<Response<Data>> _onSuccess = event();
 	private String _exceptionMessage;
-	private String _exceptionDetails;
+	private String _stackTrace;
 	private boolean _done;
 	private boolean _success;
 	private boolean _failed;
@@ -59,35 +61,40 @@ public class Response<Data> extends ContextPresenter {
 
 	public void failed(final Exception e) {
 		error(e);
-		_exceptionDetails = createTraceString(e);
+		_stackTrace = createTraceString(e);
 		failed(e.getMessage());
 	}
 
 	public void failed(final Exception e, String message) {
 		error(e);
 		_exceptionMessage = message;
-		if (is(e)) _exceptionDetails = createTraceString(e) + e.getMessage();
+		if (is(e)) _stackTrace = createTraceString(e);
 		onFailed(this);
 		onDone();
 	}
 
 	public void failed(final String message) {
 		_exceptionMessage = message;
-		onFailed(this);
+		failed(this);
+	}
+
+	public void failed(Response response) {
+		if (_canceled) return;
+		onFailed(response);
 		onDone();
 	}
 
 	public <T> Response<T> failIfFail(final Response<T> response) {
 		new OnFailed<T>(response) {
 			public void run() {
-				failed(response.getFailedMessage());
+				failed(response);
 			}
 		};
 		return response;
 	}
 
-	public String getExceptionDetails() {
-		return _exceptionDetails;
+	public String getStackTrace() {
+		return _stackTrace;
 	}
 
 	public String getFailedMessage() {
@@ -125,21 +132,22 @@ public class Response<Data> extends ContextPresenter {
 	public void onDone() {
 		if (_done) return;
 		_done = true;
-		fire(_onDone, Response.this);
+		fire(_onDone, this);
 	}
 
-	public void onFailed(Response<?> request) {
+	public void onFailed(Response<?> response) {
 		if (_canceled) return;
 		if (_failed) return;
+		if (empty(_stackTrace)) _stackTrace = createTraceString(exception());
 		_failed = true;
-		fire(_onFailed, request);
+		fire(_onFailed, response);
 	}
 
 	public void onSuccess() {
 		if (_canceled) return;
 		if (_success) return;
 		_success = Yes;
-		fire(_onSuccess, Response.this);
+		fire(_onSuccess, this);
 	}
 
 	public String params() {
@@ -147,7 +155,7 @@ public class Response<Data> extends ContextPresenter {
 	}
 
 	public void reset() {
-		_exceptionDetails = "";
+		_stackTrace = "";
 		_exceptionMessage = "";
 		_done = false;
 		_success = false;

@@ -1,5 +1,6 @@
 package cs.android.lang;
 
+import static cs.java.lang.Lang.exception;
 import android.os.Handler;
 
 public class DoLaterProcess {
@@ -8,12 +9,12 @@ public class DoLaterProcess {
 
 	public DoLaterProcess(Runnable runnable, int delay_miliseconds) {
 		_runnable = runnable;
-		handler.postDelayed(_runnable, delay_miliseconds);
+		if (!handler.postDelayed(_runnable, delay_miliseconds)) throw exception();
 	}
 
 	public DoLaterProcess(Runnable runnable) {
 		_runnable = runnable;
-		handler.post(_runnable);
+		if (!handler.post(_runnable)) throw exception();
 	}
 
 	public void stop() {

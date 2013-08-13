@@ -22,12 +22,12 @@ final class DecodeThread extends Thread {
 
 	public static final String BARCODE_BITMAP = "barcode_bitmap";
 
-	private final CaptureMain _main;
+	private final CaptureMainController _main;
 	private final Map<DecodeHintType, Object> _hints;
 	private Handler _handler;
 	private final CountDownLatch _handlerInitLatch;
 
-	DecodeThread(CaptureMain activity, Collection<BarcodeFormat> decodeFormats, String characterSet,
+	DecodeThread(CaptureMainController activity, Collection<BarcodeFormat> decodeFormats, String characterSet,
 			ResultPointCallback resultPointCallback) {
 		this._main = activity;
 		_handlerInitLatch = new CountDownLatch(1);

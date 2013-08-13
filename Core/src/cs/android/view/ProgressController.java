@@ -13,33 +13,34 @@ import cs.java.lang.Value;
 
 public class ProgressController extends ViewController {
 
-	int _inViewId;
-	Response<?> _request;
-	OnDone _onDone;
+	private int _topFrameId;
+	private Response<?> _request;
+	private OnDone _onDone;
 
-	public ProgressController(ViewController parent, int inViewId) {
+	public ProgressController(ViewController parent, int topFrameId) {
 		super(parent, layout(R.layout.load_indicator_dialog));
-		_inViewId = inViewId;
+		_topFrameId = topFrameId;
 	}
 
-	void show() {
-		info(isResumed());
+	public void show() {
+		info(this);
 		if (isResumed()) {
 			fadeIn();
-			((ViewGroup) _parent.asView()).addView(asView());
+			((ViewGroup) findViewUp(_topFrameId)).addView(asView());
 		}
 	}
 
 	public void hide() {
 		fadeOut(asView(), new Call() {
 			public void onCall(Object value) {
-				((ViewGroup) _parent.asView()).removeView(asView());
+				((ViewGroup) findViewUp(_topFrameId)).removeView(asView());
 			}
 		});
 	}
 
 	private void onRequestDone() {
 		_request = null;
+		_onDone = null;
 		hide();
 	}
 
@@ -70,12 +71,13 @@ public class ProgressController extends ViewController {
 		hide();
 	}
 
-	@Override protected void onResume() {
+	protected void onResume() {
 		super.onResume();
 		update();
 	}
 
 	public void setRequest(Response<?> request) {
+		if (is(_request)) return;
 		_request = request;
 		update();
 	}

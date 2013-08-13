@@ -1,6 +1,7 @@
 package cs.android.viewbase;
 
-import static cs.java.lang.Lang.exception;
+import static cs.java.lang.Lang.doLater;
+import static cs.java.lang.Lang.error;
 import static cs.java.lang.Lang.is;
 import static cs.java.lang.Lang.no;
 import static cs.java.lang.Lang.set;
@@ -54,6 +55,7 @@ import cs.android.aq.CSQuery;
 import cs.java.collections.List;
 import cs.java.common.Point;
 import cs.java.lang.Call;
+import cs.java.lang.Run;
 
 public class Widget<T extends View> extends ContextPresenter implements IsView {
 
@@ -108,8 +110,12 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 	}
 
 	public CSQuery aq() {
-		if (no(aq)) aq = new CSQuery(asView());
+		if (no(aq)) aq = new CSQuery(this);
 		return aq;
+	}
+
+	public CSQuery aq(int id) {
+		return aq().id(id);
 	}
 
 	public AbsListView asAbsListView() {
@@ -154,6 +160,7 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 
 	public AlphaAnimation fadeIn(final View view) {
 		AlphaAnimation animation = new AlphaAnimation(0.0f, 1.0f);
+
 		if (isVisible(view) && is(asView().getParent())) return animation;
 
 		if (is(view.getAnimation())) {
@@ -192,22 +199,23 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 	public AlphaAnimation fadeOut(final View view, final Call<View> onDone) {
 		AlphaAnimation animation = new AlphaAnimation(1.0f, 0.0f);
 
-		if (is(view.getAnimation())) {
-			view.getAnimation().cancel();
-			view.clearAnimation();
-		}
+		if (is(view.getAnimation())) view.getAnimation().cancel();
 
-		if (isHidden(view)) {
+		if (isHidden(view) && no(view.getAnimation())) {
 			if (is(onDone)) onDone.onCall(view);
 			return animation;
 		}
 
-		animation.setDuration(600);
+		animation.setDuration(400);
 		animation.setInterpolator(new AccelerateInterpolator());
 		animation.setAnimationListener(new AnimationListener() {
 			public void onAnimationEnd(Animation animation) {
 				hide(view);
-				if (is(onDone)) onDone.onCall(view);
+				if (is(onDone)) doLater(new Run() {
+					public void run() {
+						onDone.onCall(view);
+					}
+				});
 			}
 
 			public void onAnimationRepeat(Animation animation) {
@@ -329,7 +337,10 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 
 	public View getView(int id) {
 		View child = asView().findViewById(id);
-		if (no(child)) throw exception("View not found");
+		if (no(child)) {
+			error("View not found");
+			return null;
+		}
 		return child;
 	}
 
@@ -396,10 +407,6 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 	}
 
 	public void setButtonText(int viewId, int text) {
-		getButton(viewId).setText(text);
-	}
-
-	public void setButtonText(int viewId, String text) {
 		getButton(viewId).setText(text);
 	}
 
@@ -505,8 +512,7 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 	}
 
 	public void showSoftInput(View view, int flag) {
-		InputMethodManager in = (InputMethodManager) getService(Context.INPUT_METHOD_SERVICE);
-		in.showSoftInput(view, flag);
+		((InputMethodManager) getService(Context.INPUT_METHOD_SERVICE)).showSoftInput(view, flag);
 	}
 
 	public void showView() {
@@ -525,6 +531,10 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		DisplayMetrics metrics = resources.getDisplayMetrics();
 		float px = dp * (metrics.densityDpi / 160f);
 		return px;
+	}
+
+	public int toPixelInt(float dp) {
+		return (int) toPixel(dp);
 	}
 
 	protected Date getDate(DatePicker picker) {

@@ -24,12 +24,12 @@ public final class CaptureActivityHandler extends Handler {
 		PREVIEW, SUCCESS, DONE
 	}
 
-	private final CaptureMain capture;
+	private final CaptureMainController capture;
 	private final DecodeThread decodeThread;
 	private State state;
 	private final CameraManager cameraManager;
 
-	CaptureActivityHandler(CaptureMain activity, Collection<BarcodeFormat> decodeFormats,
+	CaptureActivityHandler(CaptureMainController activity, Collection<BarcodeFormat> decodeFormats,
 			String characterSet, CameraManager cameraManager) {
 		capture = activity;
 		decodeThread = new DecodeThread(activity, decodeFormats, characterSet,
@@ -59,14 +59,14 @@ public final class CaptureActivityHandler extends Handler {
 			cameraManager.requestPreviewFrame(decodeThread.getHandler(), R.id.decode);
 		} else if (message.what == R.id.return_scan_result) {
 			info("Got return scan result message");
-			capture.activity.setResult(Activity.RESULT_OK, (Intent) message.obj);
-			capture.activity.finish();
+			capture.activity().setResult(Activity.RESULT_OK, (Intent) message.obj);
+			capture.activity().finish();
 		} else if (message.what == R.id.launch_product_query) {
 			info("Got product query message");
 			String url = (String) message.obj;
 			Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-			capture.activity.startActivity(intent);
+			capture.activity().startActivity(intent);
 		}
 	}
 

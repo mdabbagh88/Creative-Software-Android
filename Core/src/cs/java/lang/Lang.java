@@ -229,42 +229,43 @@ public class Lang {
 		Lang.impl = impl;
 	}
 
-	public static boolean is(boolean object) {
+	public static boolean is(Boolean object) {
 		return set(object);
 	}
 
-	public static boolean is(byte object) {
+	public static boolean is(Byte object) {
 		return set(object);
 	}
 
-	public static boolean is(char object) {
+	public static boolean is(Character object) {
 		return set(object);
 	}
 
-	public static boolean is(double object) {
+	public static boolean is(Double object) {
 		return set(object);
 	}
 
-	public static boolean is(float object) {
+	public static boolean is(Float object) {
 		return set(object);
 	}
 
-	public static boolean is(int object) {
+	public static boolean is(Integer object) {
 		return set(object);
 	}
 
-	public static boolean is(long object) {
+	public static boolean is(Long object) {
 		return set(object);
 	}
 
-	public static boolean is(Object item) {
+	private static boolean is(Object item) {
 		return item != null;
 	}
 
 	public static boolean is(Object... items) {
+		if (items == null) return NO;
 		for (Object item : items)
-			if (!is(item)) return false;
-		return true;
+			if (!is(item)) return NO;
+		return YES;
 	}
 
 	public static Iteration<Integer> iterate(int count) {
@@ -340,34 +341,6 @@ public class Lang {
 		return map;
 	}
 
-	public static boolean no(boolean object) {
-		return empty(object);
-	}
-
-	public static boolean no(byte object) {
-		return empty(object);
-	}
-
-	public static boolean no(char object) {
-		return empty(object);
-	}
-
-	public static boolean no(double object) {
-		return empty(object);
-	}
-
-	public static boolean no(float object) {
-		return empty(object);
-	}
-
-	public static boolean no(int object) {
-		return empty(object);
-	}
-
-	public static boolean no(long object) {
-		return empty(object);
-	}
-
 	public static boolean no(Object object) {
 		return object == null;
 	}
@@ -388,6 +361,7 @@ public class Lang {
 	}
 
 	public static boolean set(Object... objects) {
+		if (objects == null) return NO;
 		for (Object object : objects)
 			if (empty(object)) return false;
 		return true;

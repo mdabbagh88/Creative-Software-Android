@@ -16,16 +16,14 @@ public class ConcurentResponse extends Response<Void> {
 		_requestCount++;
 		new OnFailed<T>(response) {
 			public void run() {
-				failed(response().getFailedMessage());
+				failed(response());
 				ConcurentResponse.this.cancel();
 			}
 		};
 		new OnSuccess<T>(response) {
 			public void run() {
 				_requestCount--;
-				if (_requestCount == 0) {
-					ConcurentResponse.this.success();
-				}
+				if (_requestCount == 0) ConcurentResponse.this.success();
 			}
 		};
 		return response;
@@ -38,8 +36,7 @@ public class ConcurentResponse extends Response<Void> {
 	}
 
 	public void onAddDone() {
-		if (_requestCount == 0)
-			successLater();
+		if (_requestCount == 0) successLater();
 	}
-	
+
 }

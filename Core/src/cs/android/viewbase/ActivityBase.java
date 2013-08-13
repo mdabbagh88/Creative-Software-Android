@@ -54,6 +54,8 @@ public abstract class ActivityBase extends SherlockFragmentActivity implements C
 	}
 
 	@Override public boolean onKeyDown(int keyCode, KeyEvent event) {
+		OnKeyDownResult onKeyDown = new OnKeyDownResult(keyCode, event);
+		presenter.onKeyDown(onKeyDown);
 		return super.onKeyDown(keyCode, event);
 	}
 

@@ -18,6 +18,10 @@ public abstract class DoLater implements Run {
 		});
 	}
 
+	public DoLater(final ViewController parent) {
+		this(parent, 0);
+	}
+
 	public DoLater(int miliseconds) {
 		doLater(miliseconds, this);
 	}

@@ -22,6 +22,7 @@ public class ActivityManager {
 	public void onCreate(Bundle state) {
 		getPresenter().setActivity(activityBase.activity());
 		getPresenter().setView(getPresenter().asView());
+		getPresenter().onBeforeCreate(state);
 		activityBase.activity().setContentView(getPresenter().asView());
 		getPresenter().onCreate(state);
 	}
