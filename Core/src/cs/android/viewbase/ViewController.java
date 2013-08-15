@@ -3,7 +3,7 @@ package cs.android.viewbase;
 import static cs.android.lang.AndroidLang.INVOKE_FAILED;
 import static cs.android.lang.AndroidLang.event;
 import static cs.android.lang.AndroidLang.invoke;
-import static cs.java.lang.Lang.No;
+import static cs.java.lang.Lang.NO;
 import static cs.java.lang.Lang.fire;
 import static cs.java.lang.Lang.is;
 import static cs.java.lang.Lang.no;
@@ -219,7 +219,7 @@ public abstract class ViewController extends Widget<View> {
 		if (no(state)) onCreateFirstTime();
 		else onCreateRestore(state);
 		created = true;
-		paused = No;
+		paused = NO;
 	}
 
 	/**

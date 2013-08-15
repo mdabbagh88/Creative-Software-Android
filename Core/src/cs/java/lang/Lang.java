@@ -29,9 +29,7 @@ public class Lang {
 	}
 
 	protected static LangCore impl;
-	public static final boolean Yes = true;
 	public static final boolean YES = true;
-	public static final boolean No = false;
 	public static final boolean NO = false;
 	public static final int SECOND = 1000;
 	public static final int HALFSECOND = 500;
@@ -130,7 +128,7 @@ public class Lang {
 	}
 
 	public static boolean empty(Object object) {
-		if (object == null) return Yes;
+		if (object == null) return YES;
 		if (object instanceof Number) return ((Number) object).floatValue() == 0;
 		if (object instanceof Boolean) return !((Boolean) object).booleanValue();
 		if (object instanceof CharSequence) return ((CharSequence) object).length() == 0;
@@ -145,7 +143,7 @@ public class Lang {
 		if (object instanceof float[]) return ((float[]) object).length == 0;
 		if (object instanceof boolean[]) return ((boolean[]) object).length == 0;
 		if (object instanceof byte[]) return ((byte[]) object).length == 0;
-		return No;
+		return NO;
 	}
 
 	public static boolean equal(Object obj1, Object obj2) {

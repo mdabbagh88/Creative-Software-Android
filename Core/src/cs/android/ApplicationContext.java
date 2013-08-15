@@ -26,6 +26,7 @@ public class ApplicationContext extends Application {
 	@Override public void onLowMemory() {
 		info();
 		BitmapAjaxCallback.clearCache();
+		AndroidLangCore.emptyLog();
 		super.onLowMemory();
 	}
 

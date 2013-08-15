@@ -1,8 +1,8 @@
 package cs.android.lang;
 
 import static cs.java.lang.Lang.MINUTE;
-import static cs.java.lang.Lang.No;
-import static cs.java.lang.Lang.Yes;
+import static cs.java.lang.Lang.NO;
+import static cs.java.lang.Lang.YES;
 import static cs.java.lang.Lang.error;
 import static cs.java.lang.Lang.exception;
 import static cs.java.lang.Lang.info;
@@ -17,18 +17,10 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-import android.app.Activity;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.pm.Signature;
 import android.graphics.drawable.Drawable;
-import android.util.Base64;
 import android.view.View;
 import android.view.ViewGroup;
 import cs.android.BuildConfig;
@@ -121,7 +113,7 @@ public class AndroidLang {
 		return null;
 	}
 
-	public static Application getAplication() {
+	public static Application aplication() {
 		return aplication;
 	}
 
@@ -165,9 +157,9 @@ public class AndroidLang {
 	public static boolean respondsTo(Object object, String methodName) {
 		try {
 			object.getClass().getMethod(methodName, (Class<?>[]) null);
-			return Yes;
+			return YES;
 		} catch (NoSuchMethodException e) {
-			return No;
+			return NO;
 		}
 	}
 
@@ -198,22 +190,6 @@ public class AndroidLang {
 			return URLEncoder.encode(argument, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			throw exception(e);
-		}
-	}
-
-	public static void printAppKeyHash(Activity activity) {
-		try {
-			PackageInfo info = activity.getPackageManager().getPackageInfo("cs.rcherz",
-					PackageManager.GET_SIGNATURES);
-			for (Signature signature : info.signatures) {
-				MessageDigest md = MessageDigest.getInstance("SHA");
-				md.update(signature.toByteArray());
-				info("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
-			}
-		} catch (NameNotFoundException e) {
-			error(e);
-		} catch (NoSuchAlgorithmException e) {
-			error(e);
 		}
 	}
 
