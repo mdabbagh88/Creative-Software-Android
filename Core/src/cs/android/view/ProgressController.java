@@ -1,6 +1,5 @@
 package cs.android.view;
 
-import static cs.java.lang.Lang.info;
 import static cs.java.lang.Lang.is;
 import static cs.java.lang.Lang.no;
 import android.view.ViewGroup;
@@ -23,7 +22,6 @@ public class ProgressController extends ViewController {
 	}
 
 	public void show() {
-		info(this);
 		if (isResumed()) {
 			fadeIn();
 			((ViewGroup) findViewUp(_topFrameId)).addView(asView());

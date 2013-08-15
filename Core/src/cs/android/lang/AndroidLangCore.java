@@ -7,6 +7,7 @@ import static cs.java.lang.Lang.string;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Date;
 
 import android.util.Log;
 import android.widget.Toast;
@@ -20,10 +21,8 @@ import cs.java.lang.Run;
 
 public class AndroidLangCore extends LangCoreImplBase implements LangCore {
 
-	private static final String LOG_TAG = "AndroidApplication";
-
-	private JSON json;
-	private static StringBuilder log = new StringBuilder();
+	private JSON _json;
+	private static StringBuilder _log = new StringBuilder();
 
 	@Override public void alert(Object... messages) {
 		Toast.makeText(ApplicationContext.getContext(), getAlertString(messages), Toast.LENGTH_LONG)
@@ -32,45 +31,45 @@ public class AndroidLangCore extends LangCoreImplBase implements LangCore {
 
 	@Override public void debug(Object... values) {
 		String debugString = getDebugString(values);
-		Log.d(LOG_TAG, debugString);
+		Log.d(AndroidLang.aplication().name(), debugString);
 		addLogMessage(createLogMessage(DEBUG_TITLE, "", values));
 	}
 
 	public static StringBuilder log() {
-		return log;
+		return _log;
 	}
 
 	private void addLogMessage(String debugString) {
 		if (debugString.length() > 750) debugString = debugString.substring(0, 750);
-		log.append(debugString).append("\n\n");
-		int trim = log.length() - 200 * THOUSAND;
-		if (trim > 0) log.delete(0, trim);
+		_log.append(new Date()).append(" ").append(debugString).append("\n\n");
+		int trim = _log.length() - 200 * THOUSAND;
+		if (trim > 0) _log.delete(0, trim);
 	}
 
 	@Override public void error(Throwable e, Object... values) {
 		String message = createLogMessage(ERROR_TITLE, "", values);
-		Log.e(LOG_TAG, ERROR_TITLE, e);
-		Log.e(LOG_TAG, message);
+		Log.e(AndroidLang.aplication().name(), ERROR_TITLE, e);
+		Log.e(AndroidLang.aplication().name(), message);
 		addLogMessage(createTraceString(e) + message);
 	}
 
 	@Override public void info(Object... values) {
 		StackTraceElement element = new Throwable().getStackTrace()[2];
 		String message = createLogMessage(INFO_TITLE, createLogString(element), values);
-		Log.i(LOG_TAG, message);
+		Log.i(AndroidLang.aplication().name(), message);
 		addLogMessage(message);
 	}
 
 	@Override public void warn(Object... values) {
 		StackTraceElement element = new Throwable().getStackTrace()[2];
 		String message = createLogMessage(WARN_TITLE, createLogString(element), values);
-		Log.w(LOG_TAG, message);
+		Log.w(AndroidLang.aplication().name(), message);
 		addLogMessage(message);
 	}
 
 	@Override public JSON json() {
-		if (is(json)) return json;
-		return json = new JSONImpl();
+		if (is(_json)) return _json;
+		return _json = new JSONImpl();
 	}
 
 	@Override public Work schedule(final int delay_miliseconds, final Run runnable) {
@@ -80,7 +79,7 @@ public class AndroidLangCore extends LangCoreImplBase implements LangCore {
 	@Override public void trace(Object... values) {
 		String message = createLogMessage(INFO_TITLE, "", values);
 		Throwable throwable = new Throwable();
-		Log.i(LOG_TAG, message, throwable);
+		Log.i(AndroidLang.aplication().name(), message, throwable);
 		addLogMessage(createTraceString(throwable) + message);
 	}
 
@@ -95,6 +94,10 @@ public class AndroidLangCore extends LangCoreImplBase implements LangCore {
 	@Override protected String createLogString(StackTraceElement element) {
 		return string(" ", element.getClassName(), element.getMethodName(), element.getFileName(),
 				element.getLineNumber());
+	}
+
+	public static void emptyLog() {
+		_log.delete(0, _log.length());
 	}
 
 }

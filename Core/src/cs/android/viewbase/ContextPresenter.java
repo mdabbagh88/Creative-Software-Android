@@ -11,6 +11,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
@@ -19,7 +21,9 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.pm.Signature;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -28,6 +32,7 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.os.PowerManager;
 import android.telephony.TelephonyManager;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import cs.android.ApplicationContext;
 import cs.android.HasContext;
@@ -45,6 +50,23 @@ public abstract class ContextPresenter extends Base implements HasContext {
 
 	public ContextPresenter(Context context) {
 		setContext(context);
+	}
+
+	public String getAppKeyHash() {
+		try {
+			PackageInfo info = context().getPackageManager().getPackageInfo("cs.rcherz",
+					PackageManager.GET_SIGNATURES);
+			for (Signature signature : info.signatures) {
+				MessageDigest md = MessageDigest.getInstance("SHA");
+				md.update(signature.toByteArray());
+				return Base64.encodeToString(md.digest(), Base64.DEFAULT);
+			}
+		} catch (NameNotFoundException e) {
+			error(e);
+		} catch (NoSuchAlgorithmException e) {
+			error(e);
+		}
+		return "";
 	}
 
 	public ContextPresenter(HasContext context) {

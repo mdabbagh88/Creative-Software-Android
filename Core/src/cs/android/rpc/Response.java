@@ -1,7 +1,7 @@
 package cs.android.rpc;
 
 import static cs.android.lang.AndroidLang.event;
-import static cs.java.lang.Lang.Yes;
+import static cs.java.lang.Lang.YES;
 import static cs.java.lang.Lang.createTraceString;
 import static cs.java.lang.Lang.doLater;
 import static cs.java.lang.Lang.empty;
@@ -47,7 +47,7 @@ public class Response<Data> extends ContextPresenter {
 
 	public void cancel() {
 		if (_canceled) return;
-		_canceled = Yes;
+		_canceled = YES;
 		onDone();
 	}
 
@@ -146,7 +146,7 @@ public class Response<Data> extends ContextPresenter {
 	public void onSuccess() {
 		if (_canceled) return;
 		if (_success) return;
-		_success = Yes;
+		_success = YES;
 		fire(_onSuccess, this);
 	}
 
