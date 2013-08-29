@@ -1,6 +1,6 @@
 package cs.android.view;
 
-import static cs.android.lang.AndroidLang.event;
+import static cs.java.lang.Lang.event;
 import static cs.java.lang.Lang.fire;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -10,7 +10,7 @@ import android.net.ConnectivityManager;
 import cs.android.viewbase.ContextPresenter;
 import cs.java.event.Event;
 
-public class NetworkReachability extends ContextPresenter {
+public class Reachability extends ContextPresenter {
 
 	private final BroadcastReceiver receiver = new BroadcastReceiver() {
 		@Override public void onReceive(Context context, Intent intent) {
@@ -20,7 +20,7 @@ public class NetworkReachability extends ContextPresenter {
 
 	private final Event<Void> networkConnected = event();
 
-	public NetworkReachability() {
+	public Reachability() {
 		start();
 	}
 

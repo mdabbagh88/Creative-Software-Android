@@ -1,6 +1,6 @@
 package cs.android.rpc;
 
-import static cs.android.lang.AndroidLang.event;
+import static cs.java.lang.Lang.event;
 import static cs.java.lang.Lang.YES;
 import static cs.java.lang.Lang.createTraceString;
 import static cs.java.lang.Lang.doLater;

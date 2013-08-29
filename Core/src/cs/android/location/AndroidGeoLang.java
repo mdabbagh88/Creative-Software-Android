@@ -1,6 +1,6 @@
 package cs.android.location;
 
-import static cs.android.lang.AndroidLang.to1E6;
+import static cs.java.lang.Lang.to1E6;
 import static cs.java.lang.Lang.no;
 import android.location.Address;
 import android.location.Location;

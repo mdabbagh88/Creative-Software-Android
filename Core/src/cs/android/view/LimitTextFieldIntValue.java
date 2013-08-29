@@ -1,6 +1,6 @@
 package cs.android.view;
 
-import static cs.android.lang.AndroidLang.alert;
+import static cs.java.lang.Lang.alert;
 import static cs.java.lang.Lang.asInt;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;

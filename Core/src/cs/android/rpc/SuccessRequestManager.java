@@ -3,12 +3,12 @@ package cs.android.rpc;
 import static cs.java.lang.Lang.SECOND;
 import static cs.java.lang.Lang.no;
 import cs.android.lang.DoLater;
-import cs.android.view.NetworkReachability;
+import cs.android.view.Reachability;
 import cs.android.viewbase.ViewController;
 
 public abstract class SuccessRequestManager<T> extends ViewController {
 
-	private NetworkReachability reachability;
+	private Reachability reachability;
 
 	public SuccessRequestManager(ViewController parent) {
 		super(parent);
@@ -16,7 +16,7 @@ public abstract class SuccessRequestManager<T> extends ViewController {
 
 	public void start() {
 		if (isNetworkConnected()) process();
-		else reachability = new NetworkReachability() {
+		else reachability = new Reachability() {
 			@Override protected void onNetworkConnected() {
 				new DoLater(SuccessRequestManager.this, 3 * SECOND) {
 					public void run() {

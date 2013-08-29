@@ -1,8 +1,12 @@
 package cs.android.rpc;
 
+import static cs.java.lang.Lang.list;
+import cs.java.collections.List;
+
 public class ConcurentResponse extends Response<Void> {
 
 	private int _requestCount;
+	private List<Response> _responses = list();
 
 	public int requestCount() {
 		return _requestCount;
@@ -13,6 +17,7 @@ public class ConcurentResponse extends Response<Void> {
 	}
 
 	public <T> Response<T> add(Response<T> response) {
+		_responses.add(response);
 		_requestCount++;
 		new OnFailed<T>(response) {
 			public void run() {
@@ -27,6 +32,12 @@ public class ConcurentResponse extends Response<Void> {
 			}
 		};
 		return response;
+	}
+
+	public void cancel() {
+		super.cancel();
+		for (Response response : _responses)
+			response.cancel();
 	}
 
 	public ConcurentResponse addAll(Response<?>... responses) {

@@ -1,9 +1,30 @@
 package cs.java.lang;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.TimeZone;
 
+import android.graphics.drawable.Drawable;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
+import cs.android.BuildConfig;
+import cs.android.CSApplication;
+import cs.android.json.JSONImpl;
+import cs.android.lang.Application;
 import cs.android.lang.DoLaterProcess;
+import cs.android.lang.WorkImpl;
+import cs.android.viewbase.ViewController;
 import cs.java.collections.GenericIterator;
 import cs.java.collections.HashMap;
 import cs.java.collections.Iteration;
@@ -15,6 +36,7 @@ import cs.java.collections.Map;
 import cs.java.collections.MapIterator;
 import cs.java.collections.Mapped;
 import cs.java.event.Event;
+import cs.java.event.EventImpl;
 import cs.java.json.JSON;
 import cs.java.json.JSONContainer;
 
@@ -28,25 +50,60 @@ public class Lang {
 		void stop();
 	}
 
-	protected static LangCore impl;
+	public static String createTraceString(Throwable throwable) {
+		if (no(throwable)) return "";
+		Text text = text();
+		if (is(throwable.getMessage())) text.add(throwable.getMessage()).addLine();
+		else text.addLine();
+
+		for (StackTraceElement element : iterate(throwable.getStackTrace()))
+			text.add(createLogString(element)).addLine();
+
+		return text.toString();
+	}
+
+	public static String createLogString(StackTraceElement element) {
+		return string("", element.getClassName(), ".", element.getMethodName(),
+				"(" + element.getFileName(), ":", element.getLineNumber(), ")").toString();
+	}
+
 	public static final boolean YES = true;
 	public static final boolean NO = false;
 	public static final int SECOND = 1000;
 	public static final int HALFSECOND = 500;
 	public static final int THOUSAND = 1000;
 	public static final int MINUTE = 60 * SECOND;
-
 	public static final int HOUR = 60 * MINUTE;
 	public static final int DAY = 24 * HOUR;
+	private static JSON _json;
+
+	public static final Object INVOKE_FAILED = "invoke_failed";
+
+	private static Application _aplication;
 
 	public static <T> void add(List<T> list, T... items) {
 		for (T item : items)
 			list.add(item);
 	}
 
-	public static void alert(String... messages) {
-		impl.alert((Object[]) messages);
-		impl.info((Object[]) messages);
+	public static void alert(int stringId) {
+		Lang.alert(_aplication.getString(stringId));
+	}
+
+	public static void alert(Object... messages) {
+		Toast.makeText(CSApplication.getContext(), getAlertString(messages), Toast.LENGTH_LONG).show();
+		info(messages);
+	}
+
+	public static boolean androidMinimum(int verCode) {
+		if (android.os.Build.VERSION.RELEASE.startsWith("1.0")) return verCode == 1;
+		else if (android.os.Build.VERSION.RELEASE.startsWith("1.1")) return verCode <= 2;
+		else if (android.os.Build.VERSION.RELEASE.startsWith("1.5")) return verCode <= 3;
+		else return android.os.Build.VERSION.SDK_INT >= verCode;
+	}
+
+	public static Application aplication() {
+		return _aplication;
 	}
 
 	public static Object[] array(Collection<?> list) {
@@ -69,6 +126,23 @@ public class Lang {
 		return null;
 	}
 
+	public static byte[] asArray(InputStream input) {
+		final byte[] buffer = new byte[0x10000];
+		int read;
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		Reader reader = null;
+		try {
+			while ((read = input.read(buffer, 0, buffer.length)) != -1)
+				out.write(buffer, 0, read);
+			out.flush();
+			return out.toByteArray();
+		} catch (Exception e) {
+			throw exception(e);
+		} finally {
+			close(reader);
+		}
+	}
+
 	public static double asDouble(Object value) {
 		try {
 			return Double.parseDouble(asString(value));
@@ -89,6 +163,26 @@ public class Lang {
 		if (empty(array)) throw exception("In Array should be something");
 	}
 
+	public static String asString(InputStream input) {
+		final char[] buffer = new char[0x10000];
+		StringBuilder out = new StringBuilder();
+		Reader reader = null;
+		try {
+			reader = new InputStreamReader(input, "UTF-8");
+			int read;
+			do {
+				read = reader.read(buffer, 0, buffer.length);
+				if (read > 0) out.append(buffer, 0, read);
+			} while (read >= 0);
+			return out.toString();
+		} catch (Exception e) {
+			error(e);
+		} finally {
+			close(reader);
+		}
+		return "";
+	}
+
 	public static String asString(Object value) {
 		return String.valueOf(value);
 	}
@@ -101,8 +195,12 @@ public class Lang {
 		return value >= from && value < to;
 	}
 
-	public static String createTraceString(Throwable ex) {
-		return impl.createTraceString(ex);
+	public static void close(InputStream inputStream) {
+		try {
+			inputStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static long currentTime() {
@@ -110,7 +208,7 @@ public class Lang {
 	}
 
 	public static void debug(Object... values) {
-		impl.debug(values);
+		aplication().logger().debug(values);
 	}
 
 	public static DoLaterProcess doLater(int delay_miliseconds, final Runnable runnable) {
@@ -158,11 +256,15 @@ public class Lang {
 	}
 
 	public static void error(Object... values) {
-		impl.error(null, values);
+		aplication().logger().error(values);
 	}
 
 	public static void error(Throwable e, Object... values) {
-		impl.error(e, values);
+		aplication().logger().error(e, values);
+	}
+
+	public static <T> Event<T> event() {
+		return new EventImpl<T>();
 	}
 
 	public static RuntimeException exception(Exception ex) {
@@ -175,6 +277,18 @@ public class Lang {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" }) public static <T> Field<T> field(String key) {
 		return new FieldImpl(key);
+	}
+
+	public static InputStream fileInput(String path) {
+		FileInputStream inputStream = null;
+		try {
+			return new FileInputStream(path);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} finally {
+			if (is(inputStream)) close(inputStream);
+		}
+		return null;
 	}
 
 	public static <T> void fire(Event<T> event, T argument) {
@@ -191,6 +305,10 @@ public class Lang {
 
 	public static <T> T first(T[] items) {
 		return list(items).first();
+	}
+
+	public static Drawable getDrawable(ViewController hasactivity, int drawable) {
+		return hasactivity.activity().getResources().getDrawable(drawable);
 	}
 
 	public static boolean has(List<?> list, Object... contents) {
@@ -220,11 +338,32 @@ public class Lang {
 	}
 
 	public static void info(Object... values) {
-		impl.info(values);
+		aplication().logger().info(values);
 	}
 
-	public static void initialize(LangCore impl) {
-		Lang.impl = impl;
+	public static Object invoke(Object object, String methodName) {
+		try {
+			return object.getClass().getMethod(methodName, (Class<?>[]) null).invoke(object);
+		} catch (Exception e) {
+			return INVOKE_FAILED;
+		}
+	}
+
+	public static <T> Object invoke(Object object, String methodName, Class<?>[] types,
+			Object[] argument) {
+		try {
+			return object.getClass().getMethod(methodName, types).invoke(object, argument);
+		} catch (Exception e) {
+			return INVOKE_FAILED;
+		}
+	}
+
+	public static <T> Object invoke(Object object, String methodName, Class<T> type, T argument) {
+		try {
+			return object.getClass().getMethod(methodName, type).invoke(object, argument);
+		} catch (Exception e) {
+			return INVOKE_FAILED;
+		}
 	}
 
 	public static boolean is(Boolean object) {
@@ -255,10 +394,6 @@ public class Lang {
 		return set(object);
 	}
 
-	private static boolean is(Object item) {
-		return item != null;
-	}
-
 	public static boolean is(Object... items) {
 		if (items == null) return NO;
 		for (Object item : items)
@@ -266,9 +401,13 @@ public class Lang {
 		return YES;
 	}
 
+	public static boolean isDebug() {
+		return BuildConfig.DEBUG;
+	}
+
 	public static Iteration<Integer> iterate(int count) {
 		return new GenericIterator<Integer>(count) {
-			@Override protected Integer getValue() {
+			protected Integer getValue() {
 				return index();
 			}
 		};
@@ -295,8 +434,17 @@ public class Lang {
 		return iterate(list(items));
 	}
 
+	public static Iteration<View> iterate(final ViewGroup layout) {
+		return new GenericIterator<View>(layout.getChildCount()) {
+			protected View getValue() {
+				return layout.getChildAt(index());
+			}
+		};
+	}
+
 	public static JSON json() {
-		return impl.json();
+		if (is(_json)) return _json;
+		return _json = new JSONImpl();
 	}
 
 	public static JSONContainer json(String json_string) {
@@ -350,8 +498,17 @@ public class Lang {
 		return true;
 	}
 
+	public static boolean respondsTo(Object object, String methodName) {
+		try {
+			object.getClass().getMethod(methodName, (Class<?>[]) null);
+			return YES;
+		} catch (NoSuchMethodException e) {
+			return NO;
+		}
+	}
+
 	public static Work schedule(final int delay_miliseconds, final Run runnable) {
-		return impl.schedule(delay_miliseconds, runnable);
+		return new WorkImpl(delay_miliseconds, runnable);
 	}
 
 	public static boolean set(CharSequence value) {
@@ -367,6 +524,18 @@ public class Lang {
 
 	public static boolean set(Object value) {
 		return !empty(value);
+	}
+
+	public static void setApplication(Application aplication) {
+		_aplication = aplication;
+	}
+
+	public static void sleep(int delay) {
+		try {
+			Thread.sleep(delay);
+		} catch (InterruptedException e) {
+			error(e);
+		}
 	}
 
 	public static String string(String separator, Object... values) {
@@ -389,8 +558,18 @@ public class Lang {
 		return new TextImpl(values);
 	}
 
-	public static void trace(Object... msg) {
-		impl.trace(msg);
+	public static long timeFrom(long time) {
+		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+		info((calendar.getTimeInMillis() - time) / MINUTE);
+		return System.currentTimeMillis() - time;
+	}
+
+	public static int to1E6(double value) {
+		return (int) (value * 1E6);
+	}
+
+	public static void trace(Object... values) {
+		aplication().logger().trace(values);
 	}
 
 	public static boolean unequal(Object obj1, Object obj2) {
@@ -410,11 +589,31 @@ public class Lang {
 	}
 
 	public static String urlEncode(String argument) {
-		return impl.urlEncode(argument);
+		try {
+			return URLEncoder.encode(argument, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			throw exception(e);
+		}
 	}
 
 	public static void warn(Object... values) {
-		impl.warn(values);
+		aplication().logger().warn(values);
+	}
+
+	private static void close(Reader reader) {
+		if (is(reader)) try {
+			reader.close();
+		} catch (IOException e) {
+			error(e);
+		}
+	}
+
+	private static boolean is(Object item) {
+		return item != null;
+	}
+
+	protected static String getAlertString(Object[] messages) {
+		return string("", messages);
 	}
 
 }

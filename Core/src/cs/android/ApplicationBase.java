@@ -1,14 +1,25 @@
 package cs.android;
 
-import cs.android.lang.AndroidLang;
+import static cs.java.lang.Lang.no;
+
+import java.io.File;
+
 import cs.android.lang.Application;
+import cs.android.lang.CSLogger;
 import cs.android.viewbase.ContextPresenter;
+import cs.java.lang.Lang;
 
 public abstract class ApplicationBase extends ContextPresenter implements Application {
 
+	CSLogger _logger;
+
 	public ApplicationBase() {
-		super(ApplicationContext.getContext());
-		AndroidLang.setApplication(this);
+		super(CSApplication.getContext());
+		Lang.setApplication(this);
+		new File(cacheDir()).mkdirs();
 	}
 
+	public CSLogger logger() {
+		return no(_logger) ? (_logger = new CSLoggerImpl(this)) : _logger;
+	}
 }

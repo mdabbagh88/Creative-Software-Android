@@ -6,10 +6,9 @@ import android.content.Context;
 
 import com.androidquery.callback.BitmapAjaxCallback;
 
-import cs.android.lang.AndroidLangCore;
 import cs.java.lang.Lang;
 
-public class ApplicationContext extends Application {
+public class CSApplication extends Application {
 
 	private static Context context;
 
@@ -19,14 +18,13 @@ public class ApplicationContext extends Application {
 
 	@Override public void onCreate() {
 		context = this;
-		Lang.initialize(new AndroidLangCore());
 		super.onCreate();
 	}
 
 	@Override public void onLowMemory() {
 		info();
 		BitmapAjaxCallback.clearCache();
-		AndroidLangCore.emptyLog();
+		Lang.aplication().logger().emptyLog();
 		super.onLowMemory();
 	}
 

@@ -1,6 +1,6 @@
 package cs.android.rpc;
 
-import static cs.android.lang.AndroidLang.sleep;
+import static cs.java.lang.Lang.sleep;
 import static cs.java.lang.Lang.iterate;
 import static cs.java.lang.Lang.list;
 

@@ -1,8 +1,8 @@
 package cs.android.viewbase;
 
-import static cs.android.lang.AndroidLang.INVOKE_FAILED;
-import static cs.android.lang.AndroidLang.event;
-import static cs.android.lang.AndroidLang.invoke;
+import static cs.java.lang.Lang.INVOKE_FAILED;
+import static cs.java.lang.Lang.event;
+import static cs.java.lang.Lang.invoke;
 import static cs.java.lang.Lang.NO;
 import static cs.java.lang.Lang.fire;
 import static cs.java.lang.Lang.is;

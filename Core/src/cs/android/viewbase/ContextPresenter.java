@@ -34,7 +34,7 @@ import android.os.PowerManager;
 import android.telephony.TelephonyManager;
 import android.util.Base64;
 import android.view.LayoutInflater;
-import cs.android.ApplicationContext;
+import cs.android.CSApplication;
 import cs.android.HasContext;
 import cs.android.aq.CSQuery;
 import cs.java.collections.List;
@@ -87,7 +87,7 @@ public abstract class ContextPresenter extends Base implements HasContext {
 	}
 
 	@Override public Context context() {
-		if (no(context)) return ApplicationContext.getContext();
+		if (no(context)) return CSApplication.getContext();
 		return context;
 	}
 

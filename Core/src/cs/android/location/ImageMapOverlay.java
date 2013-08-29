@@ -1,6 +1,6 @@
 package cs.android.location;
 
-import static cs.android.lang.AndroidLang.getDrawable;
+import static cs.java.lang.Lang.getDrawable;
 import static cs.java.lang.Lang.is;
 
 import com.google.android.maps.GeoPoint;

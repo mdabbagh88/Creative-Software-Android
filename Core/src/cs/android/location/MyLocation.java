@@ -1,6 +1,6 @@
 package cs.android.location;
 
-import static cs.android.lang.AndroidLang.event;
+import static cs.java.lang.Lang.event;
 import static cs.android.location.AndroidGeoLang.toGeoPoint;
 import static cs.java.lang.Lang.MINUTE;
 import static cs.java.lang.Lang.fire;

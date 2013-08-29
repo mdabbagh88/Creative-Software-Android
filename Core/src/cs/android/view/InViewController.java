@@ -4,12 +4,10 @@ import static cs.java.lang.Lang.NO;
 import static cs.java.lang.Lang.is;
 import static cs.java.lang.Lang.no;
 import android.view.animation.Animation;
-import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import cs.android.R;
 import cs.android.viewbase.ViewController;
 import cs.java.lang.Call;
-import cs.java.lang.Run;
 import cs.java.lang.Value;
 
 public class InViewController extends ViewController {
@@ -26,27 +24,13 @@ public class InViewController extends ViewController {
 	public void hideFromFrame(final Call<InViewController> onDone) {
 		if (no(_controller)) return;
 		Animation animation = AnimationUtils.loadAnimation(context(), R.anim.center_to_right);
-		animation.setAnimationListener(new AnimationListener() {
-			public void onAnimationEnd(Animation animation) {
-				_controller.asView().post(new Run() {
-					public void run() {
-						_controller.onDeinitialize(getState());
-						getViewGroup(_inViewId).removeView(_controller.asView());
-						_controller.onDestroy();
-						_controller = null;
-						if (is(onDone)) onDone.onCall(InViewController.this);
-						if (is(_onHide)) _onHide.onCall(InViewController.this);
-					}
-				});
-			}
-
-			public void onAnimationRepeat(Animation animation) {
-			}
-
-			public void onAnimationStart(Animation animation) {
-			}
-		});
 		_controller.asView().startAnimation(animation);
+		_controller.onDeinitialize(getState());
+		getViewGroup(_inViewId).removeView(_controller.asView());
+		_controller.onDestroy();
+		_controller = null;
+		if (is(onDone)) onDone.onCall(InViewController.this);
+		if (is(_onHide)) _onHide.onCall(InViewController.this);
 	}
 
 	public void onBackPressed(Value<Boolean> goBack) {

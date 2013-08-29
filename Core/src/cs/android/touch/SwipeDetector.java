@@ -1,6 +1,6 @@
 package cs.android.touch;
 
-import static cs.android.lang.AndroidLang.event;
+import static cs.java.lang.Lang.event;
 import static cs.java.lang.Lang.fire;
 import static cs.java.lang.Lang.info;
 import android.view.MotionEvent;
