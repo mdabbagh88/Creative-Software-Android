@@ -9,7 +9,8 @@ import cs.android.lang.CSLogger;
 import cs.android.viewbase.ContextPresenter;
 import cs.java.lang.Lang;
 
-public abstract class ApplicationBase extends ContextPresenter implements Application {
+public abstract class ApplicationBase extends ContextPresenter implements
+		Application {
 
 	private CSLogger _logger;
 
