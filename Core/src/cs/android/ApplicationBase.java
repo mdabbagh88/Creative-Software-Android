@@ -11,12 +11,16 @@ import cs.java.lang.Lang;
 
 public abstract class ApplicationBase extends ContextPresenter implements Application {
 
-	CSLogger _logger;
+	private CSLogger _logger;
 
 	public ApplicationBase() {
 		super(CSApplication.getContext());
 		Lang.setApplication(this);
 		new File(cacheDir()).mkdirs();
+	}
+
+	public String cacheDir() {
+		return context().getExternalCacheDir() + File.separator + name();
 	}
 
 	public CSLogger logger() {
