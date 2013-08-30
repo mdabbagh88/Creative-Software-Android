@@ -2,17 +2,21 @@ package cs.codescanner;
 
 import android.os.Bundle;
 import android.view.WindowManager.LayoutParams;
+import cs.android.viewbase.LayoutId;
 import cs.android.viewbase.ViewController;
 import cs.codescanner.scanner.CaptureMainController;
 
 public abstract class CaptureController extends ViewController {
 
-	protected final CaptureMainController capture = new CaptureMainController(this) {
-		@Override protected void onDecodeDone() {
+	protected final CaptureMainController capture = new CaptureMainController(
+			this) {
+		@Override
+		protected void onDecodeDone() {
 			CaptureController.this.onDecodeDone();
 		};
 
-		@Override protected void onFrameworkBug() {
+		@Override
+		protected void onFrameworkBug() {
 		}
 	};
 
@@ -20,12 +24,17 @@ public abstract class CaptureController extends ViewController {
 		super(layout(R.layout.capture));
 	}
 
-	protected void onDecodeDone() {
+	public CaptureController(LayoutId layout) {
+		super(layout);
 	}
 
-	@Override protected void onCreate(Bundle savedInstanceState) {
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		activity().getWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON);
+	}
+
+	protected void onDecodeDone() {
 	}
 
 }
