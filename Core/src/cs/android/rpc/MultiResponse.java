@@ -18,7 +18,6 @@ public class MultiResponse<T> extends Response<T> {
 		new OnFailed(response) {
 			public void run() {
 				failed(response);
-				onDone();
 			}
 		};
 		return response;

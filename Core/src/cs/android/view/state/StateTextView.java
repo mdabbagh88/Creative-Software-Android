@@ -14,7 +14,7 @@ public class StateTextView extends ViewController {
 
 	@Override protected void onCreate() {
 		super.onCreate();
-		setTextValue(viewId, textValue);
+		setText(viewId, textValue);
 	}
 
 	@Override protected void onPause() {

@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.TimeZone;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,25 +51,10 @@ public class Lang {
 		void stop();
 	}
 
-	public static String createTraceString(Throwable throwable) {
-		if (no(throwable)) return "";
-		Text text = text();
-		if (is(throwable.getMessage())) text.add(throwable.getMessage()).addLine();
-		else text.addLine();
-
-		for (StackTraceElement element : iterate(throwable.getStackTrace()))
-			text.add(createLogString(element)).addLine();
-
-		return text.toString();
-	}
-
-	public static String createLogString(StackTraceElement element) {
-		return string("", element.getClassName(), ".", element.getMethodName(),
-				"(" + element.getFileName(), ":", element.getLineNumber(), ")").toString();
-	}
-
 	public static final boolean YES = true;
+
 	public static final boolean NO = false;
+
 	public static final int SECOND = 1000;
 	public static final int HALFSECOND = 500;
 	public static final int THOUSAND = 1000;
@@ -76,9 +62,7 @@ public class Lang {
 	public static final int HOUR = 60 * MINUTE;
 	public static final int DAY = 24 * HOUR;
 	private static JSON _json;
-
 	public static final Object INVOKE_FAILED = "invoke_failed";
-
 	private static Application _aplication;
 
 	public static <T> void add(List<T> list, T... items) {
@@ -183,6 +167,15 @@ public class Lang {
 		return "";
 	}
 
+	public static String asString(Intent value) {
+		String string = value.toString() + " Extras: ";
+		for (String key : value.getExtras().keySet()) {
+			Object info = value.getExtras().get(key);
+			string += String.format("%s %s (%s)", key, info, info.getClass().getName());
+		}
+		return string;
+	}
+
 	public static String asString(Object value) {
 		return String.valueOf(value);
 	}
@@ -201,6 +194,23 @@ public class Lang {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static String createLogString(StackTraceElement element) {
+		return string("", element.getClassName(), ".", element.getMethodName(),
+				"(" + element.getFileName(), ":", element.getLineNumber(), ")").toString();
+	}
+
+	public static String createTraceString(Throwable throwable) {
+		if (no(throwable)) return "";
+		Text text = text();
+		if (is(throwable.getMessage())) text.add(throwable.getMessage()).addLine();
+		else text.addLine();
+
+		for (StackTraceElement element : iterate(throwable.getStackTrace()))
+			text.add(createLogString(element)).addLine();
+
+		return text.toString();
 	}
 
 	public static long currentTime() {
@@ -364,34 +374,6 @@ public class Lang {
 		} catch (Exception e) {
 			return INVOKE_FAILED;
 		}
-	}
-
-	public static boolean is(Boolean object) {
-		return set(object);
-	}
-
-	public static boolean is(Byte object) {
-		return set(object);
-	}
-
-	public static boolean is(Character object) {
-		return set(object);
-	}
-
-	public static boolean is(Double object) {
-		return set(object);
-	}
-
-	public static boolean is(Float object) {
-		return set(object);
-	}
-
-	public static boolean is(Integer object) {
-		return set(object);
-	}
-
-	public static boolean is(Long object) {
-		return set(object);
 	}
 
 	public static boolean is(Object... items) {

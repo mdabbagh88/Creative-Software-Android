@@ -46,6 +46,7 @@ import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.ToggleButton;
@@ -150,6 +151,11 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		return new Point(getLeft() + getWidth() / 2, getTop() + getHeight() / 2);
 	}
 
+	public void fade(boolean fadeIn) {
+		if (fadeIn) fadeIn();
+		else fadeOut();
+	}
+
 	public AlphaAnimation fadeIn() {
 		return fadeIn(asView());
 	}
@@ -184,16 +190,16 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		return animation;
 	}
 
-	private boolean isHidden(View view) {
-		return !isVisible(view);
-	}
-
 	public AlphaAnimation fadeOut() {
 		return fadeOut(asView());
 	}
 
 	public AlphaAnimation fadeOut(int view) {
 		return fadeOut(getView(view));
+	}
+
+	public AlphaAnimation fadeOut(final View view) {
+		return fadeOut(view, null);
 	}
 
 	public AlphaAnimation fadeOut(final View view, final Call<View> onDone) {
@@ -226,10 +232,6 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		});
 		view.startAnimation(animation);
 		return animation;
-	}
-
-	public AlphaAnimation fadeOut(final View view) {
-		return fadeOut(view, null);
 	}
 
 	public Button getButton(int id) {
@@ -310,6 +312,10 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		return (SeekBar) getView(i);
 	}
 
+	public Switch getSwitch(int id) {
+		return (Switch) getView(id);
+	}
+
 	public String getTextValue(int id) {
 		if (is(getTextView(id))) return getTextView(id).getText().toString();
 		return null;
@@ -364,8 +370,19 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		return asView().getWidth();
 	}
 
-	public void hide(int viewId) {
+	public void hide() {
+		hide(asView());
+	}
+
+	public void hide(boolean hide, int viewId, int... viewIds) {
+		if (hide) hide(viewId, viewIds);
+		else show(viewId, viewIds);
+	}
+
+	public void hide(int viewId, int... viewIds) {
 		hide(getView(viewId));
+		for (int id : viewIds)
+			hide(getView(id));
 	}
 
 	public void hide(View view) {
@@ -375,10 +392,6 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 	public void hideSoftInput(int flag) {
 		InputMethodManager in = (InputMethodManager) getService(Context.INPUT_METHOD_SERVICE);
 		in.hideSoftInputFromWindow(asView().getWindowToken(), flag);
-	}
-
-	public void hideView() {
-		hide(asView());
 	}
 
 	public View inflateLayout(int layout_id) {
@@ -480,7 +493,7 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		getTextView(viewId).setText(getString(stringId, args));
 	}
 
-	public void setTextValue(int viewId, String text) {
+	public void setText(int viewId, String text) {
 		getTextView(viewId).setText(text);
 	}
 
@@ -503,8 +516,14 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		else asView().setVisibility(View.GONE);
 	}
 
-	public void show(int id) {
-		show(getView(id));
+	public void show() {
+		show(asView());
+	}
+
+	public void show(int viewId, int... viewIds) {
+		show(getView(viewId));
+		for (int id : viewIds)
+			show(getView(id));
 	}
 
 	public void show(View view) {
@@ -513,10 +532,6 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 
 	public void showSoftInput(View view, int flag) {
 		((InputMethodManager) getService(Context.INPUT_METHOD_SERVICE)).showSoftInput(view, flag);
-	}
-
-	public void showView() {
-		show(asView());
 	}
 
 	public float toDp(float pixel) {
@@ -535,6 +550,14 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 
 	public int toPixelInt(float dp) {
 		return (int) toPixel(dp);
+	}
+
+	public Widget<View> widget(int id) {
+		return new Widget<View>(this, id);
+	}
+
+	private boolean isHidden(View view) {
+		return !isVisible(view);
 	}
 
 	protected Date getDate(DatePicker picker) {

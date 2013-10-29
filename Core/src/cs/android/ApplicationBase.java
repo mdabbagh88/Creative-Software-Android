@@ -4,13 +4,13 @@ import static cs.java.lang.Lang.no;
 
 import java.io.File;
 
+import android.os.Environment;
 import cs.android.lang.Application;
 import cs.android.lang.CSLogger;
 import cs.android.viewbase.ContextPresenter;
 import cs.java.lang.Lang;
 
-public abstract class ApplicationBase extends ContextPresenter implements
-		Application {
+public abstract class ApplicationBase extends ContextPresenter implements Application {
 
 	private CSLogger _logger;
 
@@ -21,7 +21,9 @@ public abstract class ApplicationBase extends ContextPresenter implements
 	}
 
 	public String cacheDir() {
-		return context().getExternalCacheDir() + File.separator + name();
+		String dir = Environment.getExternalStorageDirectory() + File.separator + name();
+		new File(dir).mkdirs();
+		return dir;
 	}
 
 	public CSLogger logger() {

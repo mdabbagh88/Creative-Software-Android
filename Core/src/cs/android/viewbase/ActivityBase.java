@@ -5,13 +5,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.KeyEvent;
-
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import cs.java.lang.Value;
 
-public abstract class ActivityBase extends SherlockFragmentActivity implements CSActivity {
+public abstract class ActivityBase extends ActionBarActivity implements CSActivity {
 
 	private ActivityManager manager;
 	private ViewController presenter;
@@ -32,6 +33,14 @@ public abstract class ActivityBase extends SherlockFragmentActivity implements C
 		return presenter;
 	}
 
+	@Override public Object getSavedInstance() {
+		return getLastCustomNonConfigurationInstance();
+	}
+
+	public MenuInflater getSupportMenuInflater() {
+		return getMenuInflater();
+	}
+
 	@Override public void onBackPressed() {
 		Value<Boolean> willPressBack = new Value<Boolean>(true);
 		presenter.onBackPressed(willPressBack);
@@ -44,13 +53,10 @@ public abstract class ActivityBase extends SherlockFragmentActivity implements C
 		activityManager().onCreate(state);
 	}
 
-	private ActivityManager activityManager() {
-		if (no(manager)) manager = createActivityManager();
-		return manager;
-	}
-
-	protected ActivityManager createActivityManager() {
-		return new ActivityManager(this);
+	public boolean onCreateOptionsMenu(Menu menu) {
+		OnMenu onMenu = new OnMenu(menu);
+		presenter.onCreateOptionsMenu(onMenu);
+		return onMenu.result.get();
 	}
 
 	@Override public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -59,8 +65,16 @@ public abstract class ActivityBase extends SherlockFragmentActivity implements C
 		return super.onKeyDown(keyCode, event);
 	}
 
-	@Override public Object getSavedInstance() {
-		return getLastCustomNonConfigurationInstance();
+	public boolean onOptionsItemSelected(MenuItem item) {
+		OnMenuItem onMenuItem = new OnMenuItem(item);
+		presenter.onOptionsItemSelected(onMenuItem);
+		return onMenuItem.result.get();
+	}
+
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		OnMenu onMenu = new OnMenu(menu);
+		presenter.onPrepareOptionsMenu(onMenu);
+		return onMenu.result.get();
 	}
 
 	@Override public Object onRetainCustomNonConfigurationInstance() {
@@ -69,6 +83,15 @@ public abstract class ActivityBase extends SherlockFragmentActivity implements C
 
 	@Override public void onSaveInstanceState(Bundle state) {
 		presenter.onSaveInstanceState(state);
+	}
+
+	private ActivityManager activityManager() {
+		if (no(manager)) manager = createActivityManager();
+		return manager;
+	}
+
+	protected ActivityManager createActivityManager() {
+		return new ActivityManager(this);
 	}
 
 	@Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -99,24 +122,6 @@ public abstract class ActivityBase extends SherlockFragmentActivity implements C
 	@Override protected void onStop() {
 		presenter.onStop();
 		super.onStop();
-	}
-
-	public boolean onCreateOptionsMenu(com.actionbarsherlock.view.Menu menu) {
-		OnMenu onMenu = new OnMenu(menu);
-		presenter.onCreateOptionsMenu(onMenu);
-		return onMenu.result.get();
-	}
-
-	public boolean onOptionsItemSelected(com.actionbarsherlock.view.MenuItem item) {
-		OnMenuItem onMenuItem = new OnMenuItem(item);
-		presenter.onOptionsItemSelected(onMenuItem);
-		return onMenuItem.result.get();
-	}
-
-	public boolean onPrepareOptionsMenu(com.actionbarsherlock.view.Menu menu) {
-		OnMenu onMenu = new OnMenu(menu);
-		presenter.onPrepareOptionsMenu(onMenu);
-		return onMenu.result.get();
 	}
 
 }

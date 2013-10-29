@@ -3,7 +3,7 @@ package cs.java.io;
 import static cs.java.lang.Lang.exception;
 import static cs.java.lang.Lang.string;
 
-abstract class CSPath {
+public abstract class CSPath {
 	static String SEPARATOR = java.io.File.separator;
 
 	public static CSPath create(String path) {
@@ -29,9 +29,9 @@ abstract class CSPath {
 		create();
 	}
 
-	public abstract void delete();
-
 	public abstract void create();
+
+	public abstract void delete();
 
 	public boolean exists() {
 		return jreFile.exists();
@@ -53,6 +53,8 @@ abstract class CSPath {
 		return jreFile.getPath();
 	}
 
+	public abstract boolean isDir();
+
 	public boolean isFile() {
 		return !isDir();
 	}
@@ -61,8 +63,6 @@ abstract class CSPath {
 		jreFile = new java.io.File(string(SEPARATOR, path));
 		check();
 	}
-
-	public abstract boolean isDir();
 
 	public void setPath(String parent, String... path) {
 		jreFile = new java.io.File(parent, string(SEPARATOR, path));

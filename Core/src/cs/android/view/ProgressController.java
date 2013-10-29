@@ -21,14 +21,14 @@ public class ProgressController extends ViewController {
 		_topFrameId = topFrameId;
 	}
 
-	public void show() {
+	public void showDialog() {
 		if (isResumed()) {
 			fadeIn();
 			((ViewGroup) findViewUp(_topFrameId)).addView(asView());
 		}
 	}
 
-	public void hide() {
+	public void hideDialog() {
 		fadeOut(asView(), new Call() {
 			public void onCall(Object value) {
 				((ViewGroup) findViewUp(_topFrameId)).removeView(asView());
@@ -39,14 +39,14 @@ public class ProgressController extends ViewController {
 	private void onRequestDone() {
 		_request = null;
 		_onDone = null;
-		hide();
+		hideDialog();
 	}
 
 	private void update() {
-		if (no(_request)) hide();
+		if (no(_request)) hideDialog();
 		else if (_request.isDone()) onRequestDone();
 		else {
-			if (no(asView().getParent())) show();
+			if (no(asView().getParent())) showDialog();
 			if (is(_onDone)) _onDone.cancel();
 			_onDone = new OnDone(this, _request) {
 				public void run() {
@@ -60,13 +60,13 @@ public class ProgressController extends ViewController {
 		super.onBackPressed(goBack);
 		if (is(_request)) {
 			_request.cancel();
-			hide();
+			hideDialog();
 		}
 	}
 
 	@Override protected void onPause() {
 		super.onPause();
-		hide();
+		hideDialog();
 	}
 
 	protected void onResume() {

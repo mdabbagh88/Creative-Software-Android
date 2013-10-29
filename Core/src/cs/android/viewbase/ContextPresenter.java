@@ -20,6 +20,7 @@ import android.app.KeyguardManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -30,6 +31,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
+import android.os.BatteryManager;
 import android.os.PowerManager;
 import android.telephony.TelephonyManager;
 import android.util.Base64;
@@ -52,33 +54,8 @@ public abstract class ContextPresenter extends Base implements HasContext {
 		setContext(context);
 	}
 
-	public String getAppKeyHash() {
-		try {
-			PackageInfo info = context().getPackageManager().getPackageInfo("cs.rcherz",
-					PackageManager.GET_SIGNATURES);
-			for (Signature signature : info.signatures) {
-				MessageDigest md = MessageDigest.getInstance("SHA");
-				md.update(signature.toByteArray());
-				return Base64.encodeToString(md.digest(), Base64.DEFAULT);
-			}
-		} catch (NameNotFoundException e) {
-			error(e);
-		} catch (NoSuchAlgorithmException e) {
-			error(e);
-		}
-		return "";
-	}
-
 	public ContextPresenter(HasContext context) {
 		setContext(context.context());
-	}
-
-	public PackageInfo getPackageInfo() {
-		try {
-			return context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-		} catch (NameNotFoundException e) {
-			return null;
-		}
 	}
 
 	public CSQuery aq() {
@@ -93,6 +70,31 @@ public abstract class ContextPresenter extends Base implements HasContext {
 
 	public ActivityManager getActivityManager() {
 		return (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+	}
+
+	public String getAppKeyHash(String packageName) {
+		try {
+			PackageInfo info = context().getPackageManager().getPackageInfo(packageName,
+					PackageManager.GET_SIGNATURES);
+			for (Signature signature : info.signatures) {
+				MessageDigest md = MessageDigest.getInstance("SHA");
+				md.update(signature.toByteArray());
+				return Base64.encodeToString(md.digest(), Base64.DEFAULT);
+			}
+		} catch (NameNotFoundException e) {
+			error(e);
+		} catch (NoSuchAlgorithmException e) {
+			error(e);
+		}
+		return "";
+	}
+
+	public PackageInfo getPackageInfo() {
+		try {
+			return context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+		} catch (NameNotFoundException e) {
+			return null;
+		}
 	}
 
 	public String getString(int id) {
@@ -128,6 +130,15 @@ public abstract class ContextPresenter extends Base implements HasContext {
 		if (empty(id)) return null;
 		Drawable drawable = context().getResources().getDrawable(id);
 		return ((BitmapDrawable) drawable).getBitmap();
+	}
+
+	protected float getBatteryPercent() {
+		IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+		Intent batteryStatus = context().registerReceiver(null, ifilter);
+		int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+		int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+		float batteryPct = level / (float) scale;
+		return batteryPct;
 	}
 
 	protected int getColor(int color) {

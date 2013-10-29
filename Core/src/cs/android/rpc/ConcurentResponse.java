@@ -1,7 +1,9 @@
 package cs.android.rpc;
 
+import static cs.java.lang.Lang.doLater;
 import static cs.java.lang.Lang.list;
 import cs.java.collections.List;
+import cs.java.lang.Run;
 
 public class ConcurentResponse extends Response<Void> {
 
@@ -47,7 +49,11 @@ public class ConcurentResponse extends Response<Void> {
 	}
 
 	public void onAddDone() {
-		if (_requestCount == 0) successLater();
+		if (_requestCount == 0) doLater(new Run() {
+			public void run() {
+				success();
+			}
+		});
 	}
 
 }

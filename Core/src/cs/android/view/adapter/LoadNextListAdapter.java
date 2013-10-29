@@ -60,7 +60,7 @@ public class LoadNextListAdapter extends ViewController {
 
 	private void onListLoad(List<?> data) {
 		_data = data;
-		loadView.hideView();
+		loadView.hide();
 		if (no(scrollListener))
 			scrollListener = new EndlessScrollListener();
 		else {
@@ -73,7 +73,7 @@ public class LoadNextListAdapter extends ViewController {
 	private void onLoadNext() {
 		fire(onLoadNext);
 		loading = true;
-		loadView.showView();
+		loadView.show();
 	}
 
 	private int totalItemCount() {
