@@ -34,7 +34,7 @@ public class ActivityManager {
 	}
 
 	private ViewController getPresenter() {
-		return activityBase.getPresenter();
+		return activityBase.controller();
 	}
 
 	private void onDestroyUnbindDrawables(View view) {

@@ -95,12 +95,11 @@ public class Settings extends ContextPresenter {
 		return null;
 	}
 
-	public Integer loadInteger(String key) {
+	public int loadInteger(String key) {
 		return preferences.getInt(key, 0);
-
 	}
 
-	public Integer loadInteger(String key, int defaultValue) {
+	public int loadInteger(String key, int defaultValue) {
 		return preferences.getInt(key, defaultValue);
 	}
 
@@ -143,15 +142,6 @@ public class Settings extends ContextPresenter {
 		}
 	}
 
-	public void save(String key, Long value) {
-		if (no(value)) clear(key);
-		else {
-			Editor editor = preferences.edit();
-			editor.putLong(key, value);
-			save(editor);
-		}
-	}
-
 	public void save(String key, JSONData data) {
 		if (no(data)) clear(key);
 		else save(key, data.save().toJSON());
@@ -160,6 +150,15 @@ public class Settings extends ContextPresenter {
 	public <T extends JSONData> void save(String key, List<T> data) {
 		if (no(data)) clear(key);
 		else save(key, json().create(data).toJSON());
+	}
+
+	public void save(String key, Long value) {
+		if (no(value)) clear(key);
+		else {
+			Editor editor = preferences.edit();
+			editor.putLong(key, value);
+			save(editor);
+		}
 	}
 
 	public <T extends JSONData> void save(String key, Map<String, T> data) {

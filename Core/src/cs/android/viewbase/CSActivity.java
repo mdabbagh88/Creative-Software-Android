@@ -8,7 +8,7 @@ import cs.java.lang.Factory;
 
 public interface CSActivity extends HasActivity, Factory<ViewController> {
 
-	ViewController getPresenter();
+	ViewController controller();
 
 	Object getSavedInstance();
 

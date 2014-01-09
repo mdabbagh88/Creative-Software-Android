@@ -1,10 +1,10 @@
 package cs.android.location;
 
 import static cs.java.lang.Lang.unexpected;
-import cs.java.json.JSONDataBase;
+import cs.java.json.JSONData;
 import cs.java.json.JSONObject;
 
-public class TextNumberValue extends JSONDataBase {
+public class TextNumberValue extends JSONData {
 
 	private Double value;
 	private String text;

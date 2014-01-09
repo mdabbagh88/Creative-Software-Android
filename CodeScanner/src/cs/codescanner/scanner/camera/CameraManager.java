@@ -49,6 +49,8 @@ public final class CameraManager {
 	 */
 	private final AutoFocusCallback autoFocusCallback;
 
+	private boolean _isTorch;
+
 	public CameraManager(Activity context) {
 		configManager = new CameraConfigurationManager(context);
 		previewCallback = new PreviewCallback(configManager);
@@ -229,6 +231,11 @@ public final class CameraManager {
 			requestedFramingRectWidth = width;
 			requestedFramingRectHeight = height;
 		}
+	}
+
+	public void setTorch(boolean isChecked) {
+		_isTorch = isChecked;
+		configManager.setTorch(camera, _isTorch);
 	}
 
 	/**

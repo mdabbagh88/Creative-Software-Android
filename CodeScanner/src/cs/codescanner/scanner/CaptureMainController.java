@@ -53,10 +53,6 @@ public class CaptureMainController extends ViewController implements SurfaceHold
 		return _formats;
 	}
 
-	public Handler handler() {
-		return handler;
-	}
-
 	public void handleDecode(Result rawResult, Bitmap barcode) {
 		inactivityTimer.onActivity();
 		_lastResult = rawResult;
@@ -64,7 +60,12 @@ public class CaptureMainController extends ViewController implements SurfaceHold
 		onDecodeDone();
 	}
 
-	protected void onDecodeDone() {
+	public Handler handler() {
+		return handler;
+	}
+
+	public Result lastResult() {
+		return _lastResult;
 	}
 
 	public void onCreate(Bundle icicle) {
@@ -131,6 +132,10 @@ public class CaptureMainController extends ViewController implements SurfaceHold
 		onResetStatus();
 	}
 
+	public void setFlash(boolean isChecked) {
+		cameraManager.setTorch(isChecked);
+	}
+
 	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 	}
 
@@ -144,22 +149,6 @@ public class CaptureMainController extends ViewController implements SurfaceHold
 
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		hasSurface = false;
-	}
-
-	CameraManager getCameraManager() {
-		return cameraManager;
-	}
-
-	ViewfinderView getViewfinderView() {
-		return viewfinderView;
-	}
-
-	protected void onFrameworkBug() {
-	}
-
-	protected void onResetStatus() {
-		viewfinderView.setVisibility(View.VISIBLE);
-		_lastResult = null;
 	}
 
 	private void decodeOrStoreSavedBitmap(Bitmap bitmap, Result result) {
@@ -189,7 +178,22 @@ public class CaptureMainController extends ViewController implements SurfaceHold
 		}
 	}
 
-	public Result lastResult() {
-		return _lastResult;
+	protected void onDecodeDone() {
+	}
+
+	protected void onFrameworkBug() {
+	}
+
+	protected void onResetStatus() {
+		viewfinderView.setVisibility(View.VISIBLE);
+		_lastResult = null;
+	}
+
+	CameraManager getCameraManager() {
+		return cameraManager;
+	}
+
+	ViewfinderView getViewfinderView() {
+		return viewfinderView;
 	}
 }

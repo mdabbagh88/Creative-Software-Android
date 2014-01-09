@@ -60,6 +60,11 @@ import cs.java.lang.Run;
 
 public class Widget<T extends View> extends ContextPresenter implements IsView {
 
+	public static int getTopRelativeTo(View view, View relativeTo) {
+		if (view.getParent() == relativeTo) return view.getTop();
+		return view.getTop() + getTopRelativeTo((View) view.getParent(), relativeTo);
+	}
+
 	public static <T extends View> Widget<T> load(View view) {
 		try {
 			return (Widget<T>) view.getTag();
@@ -337,6 +342,10 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		return asView().getTop();
 	}
 
+	public int getTopRelativeTo(View view) {
+		return getTopRelativeTo(asView(), view);
+	}
+
 	public View getView() {
 		return view;
 	}
@@ -485,16 +494,16 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		view.setLayoutParams(layoutParams);
 	}
 
+	public void setText(int viewId, String text) {
+		getTextView(viewId).setText(text);
+	}
+
 	public void setTextValue(int viewId, int stringId) {
 		getTextView(viewId).setText(getString(stringId));
 	}
 
 	public void setTextValue(int viewId, int stringId, Object... args) {
 		getTextView(viewId).setText(getString(stringId, args));
-	}
-
-	public void setText(int viewId, String text) {
-		getTextView(viewId).setText(text);
 	}
 
 	public void setView(View view) {

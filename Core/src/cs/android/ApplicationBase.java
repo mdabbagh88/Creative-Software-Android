@@ -27,6 +27,6 @@ public abstract class ApplicationBase extends ContextPresenter implements Applic
 	}
 
 	public CSLogger logger() {
-		return no(_logger) ? (_logger = new CSLoggerImpl(this)) : _logger;
+		return no(_logger) ? (_logger = new CSMemoryLoggerImpl(this)) : _logger;
 	}
 }

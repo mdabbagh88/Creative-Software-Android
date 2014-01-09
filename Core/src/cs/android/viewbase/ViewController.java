@@ -2,6 +2,7 @@ package cs.android.viewbase;
 
 import static cs.java.lang.Lang.INVOKE_FAILED;
 import static cs.java.lang.Lang.NO;
+import static cs.java.lang.Lang.YES;
 import static cs.java.lang.Lang.event;
 import static cs.java.lang.Lang.fire;
 import static cs.java.lang.Lang.invoke;
@@ -22,7 +23,6 @@ import android.support.v7.app.ActionBar;
 import android.view.Display;
 import android.view.MenuInflater;
 import android.view.View;
-import cs.android.lang.DoLater;
 import cs.java.event.Event;
 import cs.java.event.Task;
 import cs.java.lang.Value;
@@ -43,11 +43,13 @@ public abstract class ViewController extends Widget<View> {
 	public final Event<Bundle> onSaveInstance = event();
 	public final Event<Void> onDestroy = event();
 	public final Event<Void> onResume = event();
+	public final Event<Void> onUserLeaveHint = event();
 	public final Event<OnMenu> onPrepareOptionsMenu = event();
 	public final Event<OnMenuItem> onOptionsItemSelected = event();
 	public final Event<OnMenu> onCreateOptionsMenu = event();
 	public final Event<ActivityResult> onActivityResult = event();
 	public final Event<OnKeyDownResult> onKeyDown = event();
+	public final Event<Intent> onNewIntent = event();
 	private Task parentEventsTask;
 	private boolean created;
 	private boolean resumed;
@@ -56,10 +58,16 @@ public abstract class ViewController extends Widget<View> {
 	private final ViewController _parent;
 	private int viewId;
 	private LayoutId _layoutId;
-
+	private boolean started;
+	private static boolean _startingActivity;
 	private static ViewController _root;
 
+	public static boolean isStartingActivity() {
+		return _startingActivity;
+	}
+
 	public ViewController(LayoutId layoutId) {
+		_startingActivity = NO;
 		_layoutId = layoutId;
 		_parent = null;
 		_root = this;
@@ -159,6 +167,10 @@ public abstract class ViewController extends Widget<View> {
 		return is(_layoutId);
 	}
 
+	public Intent intent() {
+		return activity().getIntent();
+	}
+
 	public void invalidateOptionsMenu() {
 		((CSActivity) activity()).supportInvalidateOptionsMenu();
 	}
@@ -179,13 +191,18 @@ public abstract class ViewController extends Widget<View> {
 		return resumed;
 	}
 
+	public boolean isStarted() {
+		return started;
+	}
+
 	public void listenParent() {
 		if (is(parent()))
 			parentEventsTask = new Task(parent().onBeforeCreate, parent().onCreate, parent().onStart,
 					parent().onResume, parent().onPause, parent().onStop, parent().onSaveInstance,
 					parent().onDestroy, parent().onBack, parent().onActivityResult,
 					parent().onCreateOptionsMenu, parent().onOptionsItemSelected,
-					parent().onPrepareOptionsMenu, parent().onKeyDown) {
+					parent().onPrepareOptionsMenu, parent().onKeyDown, parent().onNewIntent,
+					parent().onUserLeaveHint) {
 				@SuppressWarnings("unchecked") public void run() {
 					if (event == parent().onBeforeCreate) onBeforeCreate((Bundle) argument);
 					else if (event == parent().onCreate) onCreate((Bundle) argument);
@@ -201,6 +218,8 @@ public abstract class ViewController extends Widget<View> {
 					else if (event == parent().onOptionsItemSelected) onOptionsItemSelected((OnMenuItem) argument);
 					else if (event == parent().onPrepareOptionsMenu) onPrepareOptionsMenu((OnMenu) argument);
 					else if (event == parent().onKeyDown) onKeyDown((OnKeyDownResult) argument);
+					else if (event == parent().onNewIntent) onNewIntent((Intent) argument);
+					else if (event == parent().onUserLeaveHint) onUserLeaveHint();
 					else throw unexpected();
 				}
 			};
@@ -208,11 +227,7 @@ public abstract class ViewController extends Widget<View> {
 
 	public void onBackPressed(Value<Boolean> goBack) {
 		fire(onBack, goBack);
-		new DoLater(200) {
-			public void run() {
-				hideSoftInput(0);
-			}
-		};
+		if (goBack.get()) goBack.set(onGoBack());
 	}
 
 	public void onBeforeCreate(Bundle state) {
@@ -249,6 +264,10 @@ public abstract class ViewController extends Widget<View> {
 		fire(onKeyDown, onKey);
 	}
 
+	public void onNewIntent(Intent intent) {
+		fire(onNewIntent, intent);
+	}
+
 	public void onOptionsItemSelected(OnMenuItem item) {
 		fire(onOptionsItemSelected, item);
 	}
@@ -266,6 +285,7 @@ public abstract class ViewController extends Widget<View> {
 	}
 
 	public void startActivity(Intent intent) {
+		_startingActivity = YES;
 		activity().startActivity(intent);
 	}
 
@@ -274,6 +294,7 @@ public abstract class ViewController extends Widget<View> {
 	}
 
 	public void startActivityForResult(Intent intent, int requestCode) {
+		_startingActivity = YES;
 		activity().startActivityForResult(intent, requestCode);
 	}
 
@@ -299,6 +320,10 @@ public abstract class ViewController extends Widget<View> {
 
 	protected Bundle getIntentExtras() {
 		return activity().getIntent().getExtras();
+	}
+
+	protected void goHome() {
+		startActivity(new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME));
 	}
 
 	protected boolean isFirstTime() {
@@ -341,6 +366,10 @@ public abstract class ViewController extends Widget<View> {
 	protected void onCreateRestore(Bundle state) {
 	}
 
+	protected Boolean onGoBack() {
+		return YES;
+	}
+
 	protected void onPause() {
 		resumed = false;
 		paused = true;
@@ -361,15 +390,18 @@ public abstract class ViewController extends Widget<View> {
 	}
 
 	protected void onStart() {
-		resumed = true;
-		paused = false;
+		started = true;
 		fire(onStart);
 	}
 
 	protected void onStop() {
-		resumed = false;
+		started = false;
 		state = null;
 		fire(onStop);
+	}
+
+	protected void onUserLeaveHint() {
+		fire(onUserLeaveHint);
 	}
 
 	protected void overridePendingTransition(int in, int out) {

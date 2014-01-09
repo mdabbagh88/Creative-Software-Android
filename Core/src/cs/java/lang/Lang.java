@@ -16,6 +16,7 @@ import java.util.TimeZone;
 
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -25,6 +26,7 @@ import cs.android.json.JSONImpl;
 import cs.android.lang.Application;
 import cs.android.lang.DoLaterProcess;
 import cs.android.lang.WorkImpl;
+import cs.android.model.Settings;
 import cs.android.viewbase.ViewController;
 import cs.java.collections.GenericIterator;
 import cs.java.collections.HashMap;
@@ -63,6 +65,8 @@ public class Lang {
 	public static final int DAY = 24 * HOUR;
 	private static JSON _json;
 	public static final Object INVOKE_FAILED = "invoke_failed";
+
+	private static final String DEBUG_MODE = "DEBUG_MODE";
 	private static Application _aplication;
 
 	public static <T> void add(List<T> list, T... items) {
@@ -171,7 +175,7 @@ public class Lang {
 		String string = value.toString() + " Extras: ";
 		for (String key : value.getExtras().keySet()) {
 			Object info = value.getExtras().get(key);
-			string += String.format("%s %s (%s)", key, info, info.getClass().getName());
+			string += String.format("%s %s (%s)", key, info, is(info) ? info.getClass().getName() : "");
 		}
 		return string;
 	}
@@ -203,14 +207,7 @@ public class Lang {
 
 	public static String createTraceString(Throwable throwable) {
 		if (no(throwable)) return "";
-		Text text = text();
-		if (is(throwable.getMessage())) text.add(throwable.getMessage()).addLine();
-		else text.addLine();
-
-		for (StackTraceElement element : iterate(throwable.getStackTrace()))
-			text.add(createLogString(element)).addLine();
-
-		return text.toString();
+		return Log.getStackTraceString(throwable);
 	}
 
 	public static long currentTime() {
@@ -219,6 +216,13 @@ public class Lang {
 
 	public static void debug(Object... values) {
 		aplication().logger().debug(values);
+	}
+
+	public static void debugAlert(Object... messages) {
+		if (isDebugMode())
+			Toast.makeText(CSApplication.getContext(), getAlertString(messages), Toast.LENGTH_LONG)
+					.show();
+		info(messages);
 	}
 
 	public static DoLaterProcess doLater(int delay_miliseconds, final Runnable runnable) {
@@ -321,6 +325,13 @@ public class Lang {
 		return hasactivity.activity().getResources().getDrawable(drawable);
 	}
 
+	public static Throwable getRoot(Throwable t) {
+		Throwable result = t;
+		while (result.getCause() != null)
+			result = result.getCause();
+		return result;
+	}
+
 	public static boolean has(List<?> list, Object... contents) {
 		return has(list.toArray(), contents);
 	}
@@ -383,8 +394,12 @@ public class Lang {
 		return YES;
 	}
 
-	public static boolean isDebug() {
+	public static boolean isDebugBuild() {
 		return BuildConfig.DEBUG;
+	}
+
+	public static boolean isDebugMode() {
+		return Settings.get().loadBoolean(DEBUG_MODE);
 	}
 
 	public static Iteration<Integer> iterate(int count) {
@@ -512,6 +527,10 @@ public class Lang {
 		_aplication = aplication;
 	}
 
+	public static void setDebug(boolean value) {
+		Settings.get().save(DEBUG_MODE, value);
+	}
+
 	public static void sleep(int delay) {
 		try {
 			Thread.sleep(delay);
@@ -548,10 +567,6 @@ public class Lang {
 
 	public static int to1E6(double value) {
 		return (int) (value * 1E6);
-	}
-
-	public static void trace(Object... values) {
-		aplication().logger().trace(values);
 	}
 
 	public static boolean unequal(Object obj1, Object obj2) {
@@ -595,7 +610,7 @@ public class Lang {
 	}
 
 	protected static String getAlertString(Object[] messages) {
-		return string("", messages);
+		return string(" ", messages);
 	}
 
 }

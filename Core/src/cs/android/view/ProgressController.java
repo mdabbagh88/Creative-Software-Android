@@ -3,7 +3,6 @@ package cs.android.view;
 import static cs.java.lang.Lang.is;
 import static cs.java.lang.Lang.no;
 import android.view.ViewGroup;
-import cs.android.R;
 import cs.android.rpc.OnDone;
 import cs.android.rpc.Response;
 import cs.android.viewbase.ViewController;
@@ -13,19 +12,15 @@ import cs.java.lang.Value;
 public class ProgressController extends ViewController {
 
 	private int _topFrameId;
-	private Response<?> _request;
+	private Response<?> _response;
 	private OnDone _onDone;
+	private int _labelId;
 
-	public ProgressController(ViewController parent, int topFrameId) {
-		super(parent, layout(R.layout.load_indicator_dialog));
+	public ProgressController(ViewController parent, int topFrameId, int layout, int label_id,
+			int bar_id) {
+		super(parent, layout(layout));
 		_topFrameId = topFrameId;
-	}
-
-	public void showDialog() {
-		if (isResumed()) {
-			fadeIn();
-			((ViewGroup) findViewUp(_topFrameId)).addView(asView());
-		}
+		_labelId = label_id;
 	}
 
 	public void hideDialog() {
@@ -36,31 +31,45 @@ public class ProgressController extends ViewController {
 		});
 	}
 
+	public void onBackPressed(Value<Boolean> goBack) {
+		super.onBackPressed(goBack);
+		if (is(_response)) {
+			_response.cancel();
+			hideDialog();
+		}
+	}
+
+	public void setResponse(Response<?> response) {
+		if (is(_response)) return;
+		_response = response;
+		update();
+	}
+
+	public void showProgress() {
+		if (isResumed()) {
+			if (is(_response)) setText(_labelId, _response.progressLabel());
+			fadeIn();
+			((ViewGroup) findViewUp(_topFrameId)).addView(asView());
+		}
+	}
+
 	private void onRequestDone() {
-		_request = null;
+		_response = null;
 		_onDone = null;
 		hideDialog();
 	}
 
 	private void update() {
-		if (no(_request)) hideDialog();
-		else if (_request.isDone()) onRequestDone();
+		if (no(_response)) hideDialog();
+		else if (_response.isDone()) onRequestDone();
 		else {
-			if (no(asView().getParent())) showDialog();
+			if (no(asView().getParent())) showProgress();
 			if (is(_onDone)) _onDone.cancel();
-			_onDone = new OnDone(this, _request) {
+			_onDone = new OnDone(this, _response) {
 				public void run() {
 					onRequestDone();
 				}
 			};
-		}
-	}
-
-	public void onBackPressed(Value<Boolean> goBack) {
-		super.onBackPressed(goBack);
-		if (is(_request)) {
-			_request.cancel();
-			hideDialog();
 		}
 	}
 
@@ -71,12 +80,6 @@ public class ProgressController extends ViewController {
 
 	protected void onResume() {
 		super.onResume();
-		update();
-	}
-
-	public void setRequest(Response<?> request) {
-		if (is(_request)) return;
-		_request = request;
 		update();
 	}
 }

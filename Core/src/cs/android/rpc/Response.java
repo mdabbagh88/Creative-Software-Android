@@ -2,8 +2,8 @@ package cs.android.rpc;
 
 import static cs.java.lang.Lang.YES;
 import static cs.java.lang.Lang.createTraceString;
+import static cs.java.lang.Lang.debugAlert;
 import static cs.java.lang.Lang.empty;
-import static cs.java.lang.Lang.error;
 import static cs.java.lang.Lang.event;
 import static cs.java.lang.Lang.exception;
 import static cs.java.lang.Lang.fire;
@@ -27,6 +27,7 @@ public class Response<Data> extends ContextPresenter {
 	private boolean _canceled;
 	private Url _url;
 	private Activity _activity;
+	private String _progressLabel;
 
 	public Response() {
 	}
@@ -40,9 +41,9 @@ public class Response<Data> extends ContextPresenter {
 	}
 
 	public void cancel() {
-		if (_canceled) return;
+		if (_canceled || _done) return;
 		_canceled = YES;
-		done();
+		onDone();
 	}
 
 	public String content() {
@@ -53,26 +54,18 @@ public class Response<Data> extends ContextPresenter {
 		return _data;
 	}
 
-	public void failed(final Exception e) {
-		if (_canceled) return;
-		error(e);
-		_stackTrace = createTraceString(e);
-		failed(e.getMessage());
-	}
-
 	public void failed(final Exception e, String message) {
 		if (_canceled) return;
-		error(e);
 		_message = message;
 		if (is(e)) _stackTrace = createTraceString(e);
-		if (!_canceled) onFailed(this);
-		done();
+		onFailed(this);
+		onDone();
 	}
 
 	public void failed(Response response) {
 		if (_canceled) return;
 		onFailed(response);
-		done();
+		onDone();
 	}
 
 	public void failed(final String message) {
@@ -126,6 +119,15 @@ public class Response<Data> extends ContextPresenter {
 		return "";
 	}
 
+	public String progressLabel() {
+		return _progressLabel;
+	}
+
+	public Response<Data> progressLabel(String progressLabel) {
+		_progressLabel = progressLabel;
+		return this;
+	}
+
 	public void reset() {
 		_stackTrace = "";
 		_message = "";
@@ -142,7 +144,7 @@ public class Response<Data> extends ContextPresenter {
 	public void success() {
 		if (_canceled) return;
 		onSuccess();
-		done();
+		onDone();
 	}
 
 	public void success(Data data) {
@@ -153,10 +155,6 @@ public class Response<Data> extends ContextPresenter {
 
 	public Url url() {
 		return _url;
-	}
-
-	private void done() {
-		onDone();
 	}
 
 	protected Activity activity() {
@@ -170,13 +168,16 @@ public class Response<Data> extends ContextPresenter {
 	}
 
 	protected void onFailed(Response<?> response) {
+		debugAlert("Failed", url());
 		if (_failed) throw exception();
 		_failed = YES;
 		if (empty(_stackTrace)) _stackTrace = createTraceString(exception());
+		_message = response.message();
 		fire(_onFailed, response);
 	}
 
 	protected void onSuccess() {
+		debugAlert("Success", url());
 		if (_success) throw exception();
 		_success = YES;
 		fire(_onSuccess, this);

@@ -10,10 +10,6 @@ public class ConcurentResponse extends Response<Void> {
 	private int _requestCount;
 	private List<Response> _responses = list();
 
-	public int requestCount() {
-		return _requestCount;
-	}
-
 	public ConcurentResponse(Response<?>... responses) {
 		addAll(responses);
 	}
@@ -23,8 +19,7 @@ public class ConcurentResponse extends Response<Void> {
 		_requestCount++;
 		new OnFailed<T>(response) {
 			public void run() {
-				failed(response());
-				ConcurentResponse.this.cancel();
+				onResponseFailed(response());
 			}
 		};
 		new OnSuccess<T>(response) {
@@ -36,16 +31,16 @@ public class ConcurentResponse extends Response<Void> {
 		return response;
 	}
 
-	public void cancel() {
-		super.cancel();
-		for (Response response : _responses)
-			response.cancel();
-	}
-
 	public ConcurentResponse addAll(Response<?>... responses) {
 		for (Response<?> response : responses)
 			add(response);
 		return this;
+	}
+
+	public void cancel() {
+		super.cancel();
+		for (Response response : _responses)
+			response.cancel();
 	}
 
 	public void onAddDone() {
@@ -54,6 +49,16 @@ public class ConcurentResponse extends Response<Void> {
 				success();
 			}
 		});
+	}
+
+	public int requestCount() {
+		return _requestCount;
+	}
+
+	private void onResponseFailed(Response failedResponse) {
+		failed(failedResponse);
+		for (Response response : _responses)
+			if (response != failedResponse) response.cancel();
 	}
 
 }

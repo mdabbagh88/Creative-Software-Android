@@ -21,6 +21,10 @@ public class InViewController extends ViewController {
 		_inViewId = inViewId;
 	}
 
+	public void hideController() {
+		hideFromFrame(null);
+	}
+
 	public void hideFromFrame(final Call<InViewController> onDone) {
 		if (no(_controller)) return;
 		Animation animation = AnimationUtils.loadAnimation(context(), R.anim.center_to_right);
@@ -33,12 +37,20 @@ public class InViewController extends ViewController {
 		if (is(_onHide)) _onHide.onCall(InViewController.this);
 	}
 
+	public void hideInView() {
+		hideFromFrame(null);
+	}
+
 	public void onBackPressed(Value<Boolean> goBack) {
 		super.onBackPressed(goBack);
 		if (is(_controller) && goBack.get()) {
 			goBack.set(NO);
 			hideFromFrame(null);
 		}
+	}
+
+	public void setOnHideListener(Call<InViewController> onHide) {
+		_onHide = onHide;
 	}
 
 	public void showController(final ViewController controller) {
@@ -56,18 +68,6 @@ public class InViewController extends ViewController {
 		_controller.onInitialize(null);
 		_controller.asView().startAnimation(
 				AnimationUtils.loadAnimation(context(), R.anim.right_to_center));
-	}
-
-	public void hideInView() {
-		hideFromFrame(null);
-	}
-
-	public void setOnHideListener(Call<InViewController> onHide) {
-		_onHide = onHide;
-	}
-
-	public void hideController() {
-		hideFromFrame(null);
 	}
 
 }

@@ -2,11 +2,9 @@ package cs.android.lang;
 
 public interface CSLogger {
 
-	void emptyLog();
-
-	String log();
-
 	void debug(Object... values);
+
+	void emptyLog();
 
 	void error(Object... values);
 
@@ -14,7 +12,7 @@ public interface CSLogger {
 
 	void info(Object... values);
 
-	void trace(Object... values);
+	String log();
 
 	void warn(Object... values);
 

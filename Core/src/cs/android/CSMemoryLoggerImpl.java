@@ -11,7 +11,7 @@ import cs.android.lang.CSLogger;
 import cs.java.lang.Lang;
 import cs.java.lang.Text;
 
-public class CSLoggerImpl implements CSLogger {
+public class CSMemoryLoggerImpl implements CSLogger {
 
 	public static final String ERROR_TITLE = "Error";
 	public static final String DEBUG_TITLE = "Debug";
@@ -32,7 +32,7 @@ public class CSLoggerImpl implements CSLogger {
 	}
 
 	protected static String getDebugString(Object... values) {
-		return createLogMessage("Debug: ", getCallingStackInfo(), values);
+		return createLogMessage(DEBUG_TITLE, getCallingStackInfo(), values);
 	}
 
 	protected static String getErrorString(Throwable e, Object... values) {
@@ -40,23 +40,19 @@ public class CSLoggerImpl implements CSLogger {
 	}
 
 	protected static String getInfoString(Object[] values) {
-		return createLogMessage("Info: ", getCallingStackInfo(), values);
-	}
-
-	protected static String getTraceString(Object... values) {
-		return createLogMessage("Trace: ", Lang.createTraceString(new Throwable()), values);
+		return createLogMessage(INFO_TITLE, "", values);
 	}
 
 	private StringBuilder _log = new StringBuilder();
 
 	private Application _application;
 
-	public CSLoggerImpl(Application application) {
+	public CSMemoryLoggerImpl(Application application) {
 		_application = application;
 	}
 
 	public void addMemoryLogMessage(String debugString) {
-		if (debugString.length() > 200) debugString = debugString.substring(0, 200);
+		if (debugString.length() > THOUSAND) debugString = debugString.substring(0, THOUSAND);
 		_log.append(new Date()).append(" ").append(debugString).append("\n\n");
 		int trim = _log.length() - 9 * THOUSAND;
 		if (trim > 0) _log.delete(trim, _log.length());
@@ -80,25 +76,18 @@ public class CSLoggerImpl implements CSLogger {
 
 	public void error(Throwable e, Object... values) {
 		String message = getErrorString(e, values);
-		Log.e(_application.name(), message);
+		Log.e(_application.name(), message, e);
 		addMemoryLogMessage(message);
 	}
 
 	public void info(Object... values) {
-		String message = createLogMessage(INFO_TITLE, createLogString(), values);
+		String message = getInfoString(values);
 		Log.i(_application.name(), message);
 		addMemoryLogMessage(message);
 	}
 
 	public String log() {
 		return _log.toString();
-	}
-
-	public void trace(Object... values) {
-		String message = Lang.createTraceString(new Throwable())
-				+ createLogMessage(INFO_TITLE, "", values);
-		Log.i(_application.name(), message);
-		addMemoryLogMessage(message);
 	}
 
 	public void warn(Object... values) {

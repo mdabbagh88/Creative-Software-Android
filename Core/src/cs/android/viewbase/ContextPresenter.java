@@ -16,6 +16,7 @@ import java.security.NoSuchAlgorithmException;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
+import android.app.AlarmManager;
 import android.app.KeyguardManager;
 import android.app.Service;
 import android.content.Context;
@@ -70,6 +71,10 @@ public abstract class ContextPresenter extends Base implements HasContext {
 
 	public ActivityManager getActivityManager() {
 		return (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+	}
+
+	public AlarmManager getAlarmManager() {
+		return (AlarmManager) context().getSystemService(Context.ALARM_SERVICE);
 	}
 
 	public String getAppKeyHash(String packageName) {

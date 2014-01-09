@@ -23,9 +23,8 @@ final class CameraConfigurationManager {
 
 	private static void doSetTorch(Camera.Parameters parameters, boolean newSetting) {
 		String flashMode;
-		if (newSetting)
-			flashMode = findSettableValue(parameters.getSupportedFlashModes(),
-					Camera.Parameters.FLASH_MODE_TORCH, Camera.Parameters.FLASH_MODE_ON);
+		if (newSetting) flashMode = findSettableValue(parameters.getSupportedFlashModes(),
+				Camera.Parameters.FLASH_MODE_TORCH, Camera.Parameters.FLASH_MODE_ON);
 		else flashMode = findSettableValue(parameters.getSupportedFlashModes(),
 				Camera.Parameters.FLASH_MODE_OFF);
 		if (flashMode != null) parameters.setFlashMode(flashMode);
@@ -90,7 +89,7 @@ final class CameraConfigurationManager {
 	/**
 	 * Reads, one time, values from the camera that are needed by the app.
 	 */
-	 void initFromCameraParameters(Camera camera) {
+	void initFromCameraParameters(Camera camera) {
 		Camera.Parameters parameters = camera.getParameters();
 		WindowManager manager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
 		Display display = manager.getDefaultDisplay();

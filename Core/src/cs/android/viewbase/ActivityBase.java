@@ -29,7 +29,7 @@ public abstract class ActivityBase extends ActionBarActivity implements CSActivi
 		return this;
 	}
 
-	@Override public ViewController getPresenter() {
+	@Override public ViewController controller() {
 		return presenter;
 	}
 
@@ -104,6 +104,11 @@ public abstract class ActivityBase extends ActionBarActivity implements CSActivi
 		activityManager().onDestroy();
 	}
 
+	protected void onNewIntent(Intent intent) {
+		presenter.onNewIntent(intent);
+		super.onNewIntent(intent);
+	}
+
 	@Override protected void onPause() {
 		presenter.onPause();
 		super.onPause();
@@ -122,6 +127,11 @@ public abstract class ActivityBase extends ActionBarActivity implements CSActivi
 	@Override protected void onStop() {
 		presenter.onStop();
 		super.onStop();
+	}
+
+	protected void onUserLeaveHint() {
+		presenter.onUserLeaveHint();
+		super.onUserLeaveHint();
 	}
 
 }
