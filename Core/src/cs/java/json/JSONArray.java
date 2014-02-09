@@ -1,5 +1,7 @@
 package cs.java.json;
 
+import java.util.List;
+
 public interface JSONArray extends JSONContainer, Iterable<JSONType> {
 
 	void add(boolean value);
@@ -23,4 +25,6 @@ public interface JSONArray extends JSONContainer, Iterable<JSONType> {
 	String getString(int index);
 
 	void set(int index, JSONType value);
+	
+	JSONArray loadStrings(List<String> objects);
 }

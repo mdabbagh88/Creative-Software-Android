@@ -18,6 +18,10 @@ public abstract class OnItemLongClickAdapter implements OnItemLongClickListener,
 		view.getListView(listViewId).setOnItemLongClickListener(this);
 	}
 
+	public OnItemLongClickAdapter(Widget<?> view) {
+		view.asAbsListView().setOnItemLongClickListener(this);
+	}
+
 	public boolean onItemLongClick(AdapterView<?> adapter, View view, int position, long rowId) {
 		_clickAdapter = adapter;
 		_clickView = view;

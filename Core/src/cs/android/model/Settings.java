@@ -14,7 +14,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Build;
-import cs.android.viewbase.ContextPresenter;
+import cs.android.viewbase.ContextController;
 import cs.java.collections.List;
 import cs.java.collections.MapItem;
 import cs.java.json.JSONArray;
@@ -25,7 +25,7 @@ import cs.java.model.Credentials;
 import cs.java.model.CredentialsImpl;
 
 @SuppressLint("CommitPrefEdits")
-public class Settings extends ContextPresenter {
+public class Settings extends ContextController {
 
 	private static Settings instance = new Settings();
 

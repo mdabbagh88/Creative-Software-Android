@@ -14,17 +14,14 @@ public class EventImpl<T> extends Base implements Event<T> {
 			this.listener = listener;
 		}
 
-		@Override
-		public void cancel() {
+		@Override public void cancel() {
 			int index = registrations.getIndex(this);
 			if (index < 0) throw exception("Listener not found");
-			if (running)
-				toRemove.add(this);
+			if (running) toRemove.add(this);
 			else registrations.remove(index);
 		}
 
-		@Override
-		public Event<?> getEvent() {
+		@Override public Event<?> getEvent() {
 			return EventImpl.this;
 		}
 	}
@@ -37,17 +34,14 @@ public class EventImpl<T> extends Base implements Event<T> {
 	public EventImpl() {
 	}
 
-	@Override
-	public EventRegistration add(final Listener listener) {
+	@Override public EventRegistration add(final Listener listener) {
 		EventRegistrationImpl registration = new EventRegistrationImpl(listener);
-		if (running)
-			toAdd.add(registration);
+		if (running) toAdd.add(registration);
 		else registrations.add(registration);
 		return registration;
 	}
 
-	@Override
-	public void run(T argument) {
+	@Override public void run(T argument) {
 		if (running) throw exception("Event runned while running");
 		if (registrations.isEmpty()) return;
 
@@ -61,6 +55,10 @@ public class EventImpl<T> extends Base implements Event<T> {
 			registrations.add(registration);
 		toAdd.clear();
 		running = false;
+	}
+
+	public void clear() {
+		registrations.clear();
 	}
 
 }

@@ -1,11 +1,20 @@
 package cs.java.collections;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class ListImpl<T> extends ArrayList<T> implements List<T> {
 
 	public ListImpl() {
 		super();
+	}
+
+	public ListImpl(Collection<? extends T> collection) {
+		super(collection);
+	}
+
+	public ListImpl(int capacity) {
+		super(capacity);
 	}
 
 	public ListImpl(java.util.List<T> list) {
@@ -35,7 +44,7 @@ public class ListImpl<T> extends ArrayList<T> implements List<T> {
 		return indexOf(item);
 	}
 
-	@Override public boolean hasContents() {
+	@Override public boolean hasSometing() {
 		return size() > 0;
 	}
 
@@ -61,5 +70,14 @@ public class ListImpl<T> extends ArrayList<T> implements List<T> {
 
 	public T removeLast() {
 		return remove(size() - 1);
+	}
+
+	public int count() {
+		return size();
+	}
+
+	public List<T> removeAll() {
+		clear();
+		return this;
 	}
 }

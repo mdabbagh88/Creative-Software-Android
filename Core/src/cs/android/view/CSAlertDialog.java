@@ -8,11 +8,11 @@ import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.widget.EditText;
-import cs.android.viewbase.ContextPresenter;
+import cs.android.viewbase.ContextController;
 import cs.android.viewbase.Widget;
 import cs.java.lang.Call;
 
-public class CSAlertDialog extends ContextPresenter {
+public class CSAlertDialog extends ContextController {
 
 	private Builder _dialog;
 	private EditText _inputField;

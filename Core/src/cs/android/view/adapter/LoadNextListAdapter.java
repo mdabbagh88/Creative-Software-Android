@@ -1,5 +1,6 @@
 package cs.android.view.adapter;
 
+import static cs.java.lang.Lang.NO;
 import static cs.java.lang.Lang.event;
 import static cs.java.lang.Lang.fire;
 import static cs.java.lang.Lang.is;
@@ -7,7 +8,7 @@ import static cs.java.lang.Lang.no;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
-import cs.android.view.DataListPresenter;
+import cs.android.view.list.ListController;
 import cs.android.viewbase.ViewController;
 import cs.android.viewbase.Widget;
 import cs.java.collections.List;
@@ -44,7 +45,7 @@ public class LoadNextListAdapter extends ViewController {
 	private boolean loading;
 	private List<?> _data;
 
-	public <T> LoadNextListAdapter(DataListPresenter<T> parent, int loadViewLayout) {
+	public <T> LoadNextListAdapter(ListController<T> parent, int loadViewLayout) {
 		super(parent);
 		loadView = new Widget<View>(this, layout(loadViewLayout));
 		new Job<List<T>>(parent.getOnLoad()) {
@@ -88,6 +89,7 @@ public class LoadNextListAdapter extends ViewController {
 		super.onResume();
 		updateScrollListener();
 		asListView().addFooterView(loadView.asView());
+		asListView().setFooterDividersEnabled(NO);
 	}
 
 	protected void onScroll() {

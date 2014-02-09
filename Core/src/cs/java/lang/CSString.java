@@ -13,4 +13,9 @@ public class CSString {
 			text[i] = letters.charAt(random.nextInt(letters.length()));
 		return new String(text);
 	}
+
+	public static boolean containsCaseInsensitive(String string1, String string2) {
+		return string1.toLowerCase().contains(string2.toLowerCase());
+	}
+
 }

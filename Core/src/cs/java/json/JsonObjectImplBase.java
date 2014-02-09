@@ -31,7 +31,7 @@ public abstract class JsonObjectImplBase extends JSONTypeImpl implements JSONObj
 		if (is(value)) {
 			JSONArray typeValue = value.asArray();
 			if (is(typeValue)) return typeValue;
-			throw exception("Expected JSONObject, found ", value.getValue());
+			throw exception("Expected JSONArray, found ", value.getValue());
 		}
 		return null;
 	}
@@ -51,6 +51,8 @@ public abstract class JsonObjectImplBase extends JSONTypeImpl implements JSONObj
 		if (is(value)) return value.doubleValue();
 		return null;
 	}
+
+	protected abstract JSONType getImpl(String key);
 
 	@Override public Integer getInteger(String key) {
 		Number value = getNumber(key);
@@ -105,6 +107,4 @@ public abstract class JsonObjectImplBase extends JSONTypeImpl implements JSONObj
 	@Override public void put(String key, String value) {
 		put(key, json().create(value));
 	}
-
-	protected abstract JSONType getImpl(String key);
 }

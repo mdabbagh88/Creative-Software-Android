@@ -3,9 +3,9 @@ package cs.android;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
-import cs.android.viewbase.ContextPresenter;
+import cs.android.viewbase.ContextController;
 
-public abstract class ServicePresenter extends ContextPresenter {
+public abstract class ServicePresenter extends ContextController {
 	protected final Service service;
 
 	public ServicePresenter(Service service) {

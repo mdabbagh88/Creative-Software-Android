@@ -27,7 +27,7 @@ public class Url {
 
 	public Url(String url, Object... arguments) {
 		this(url);
-		addArguments(map((Object[]) arguments));
+		add(map((Object[]) arguments));
 	}
 
 	public Url add(String argument, Object value) {
@@ -35,7 +35,7 @@ public class Url {
 		return this;
 	}
 
-	public Url addArguments(Map<String, String> arguments) {
+	public Url add(Map<String, String> arguments) {
 		for (Mapped<String, String> mapped : iterate(arguments))
 			add(mapped.key(), mapped.value());
 		return this;

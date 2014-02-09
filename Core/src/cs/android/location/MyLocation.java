@@ -14,10 +14,10 @@ import android.os.Bundle;
 
 import com.google.android.maps.GeoPoint;
 
-import cs.android.viewbase.ContextPresenter;
+import cs.android.viewbase.ContextController;
 import cs.java.event.Event;
 
-public class MyLocation extends ContextPresenter {
+public class MyLocation extends ContextController {
 
 	private class MyLocationListener implements LocationListener {
 		@Override

@@ -11,4 +11,12 @@ public class OnMenuItem {
 		this.item = item;
 		result = new Value<Boolean>(false);
 	}
+
+	public int id() {
+		return item.getItemId();
+	}
+
+	public void result(boolean b) {
+		result.set(b);
+	}
 }

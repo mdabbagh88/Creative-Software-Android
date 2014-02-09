@@ -18,11 +18,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.view.Display;
 import android.view.MenuInflater;
 import android.view.View;
+import cs.android.view.InViewController;
 import cs.java.event.Event;
 import cs.java.event.Task;
 import cs.java.lang.Value;
@@ -40,6 +42,7 @@ public abstract class ViewController extends Widget<View> {
 	public final Event<Value<Boolean>> onBack = event();
 	public final Event<Void> onStart = event();
 	public final Event<Void> onStop = event();
+	public final Event<Void> onLowMemory = event();
 	public final Event<Bundle> onSaveInstance = event();
 	public final Event<Void> onDestroy = event();
 	public final Event<Void> onResume = event();
@@ -59,11 +62,17 @@ public abstract class ViewController extends Widget<View> {
 	private int viewId;
 	private LayoutId _layoutId;
 	private boolean started;
+	private InViewController _parentInView;
 	private static boolean _startingActivity;
 	private static ViewController _root;
 
 	public static boolean isStartingActivity() {
 		return _startingActivity;
+	}
+
+	public ViewController(InViewController parent, LayoutId id) {
+		this((ViewController) parent, id);
+		_parentInView = parent;
 	}
 
 	public ViewController(LayoutId layoutId) {
@@ -115,7 +124,7 @@ public abstract class ViewController extends Widget<View> {
 		View view = null;
 		ViewController parent = parent();
 		while (parent != null && (view = parent.getViewGroup(id)) == null)
-			parent = parent().getParent();
+			parent = parent().parent();
 		return view;
 	}
 
@@ -123,16 +132,20 @@ public abstract class ViewController extends Widget<View> {
 		return ((CSActivity) activity()).getSupportActionBar();
 	}
 
+	public Fragment getFragment(int id) {
+		return getFragmentManager().findFragmentById(id);
+	}
+
 	public FragmentManager getFragmentManager() {
 		return ((CSActivity) activity()).getSupportFragmentManager();
 	}
 
-	public MenuInflater getMenuInflater() {
-		return ((CSActivity) activity()).getSupportMenuInflater();
+	protected Bundle getIntentExtras() {
+		return activity().getIntent().getExtras();
 	}
 
-	public ViewController getParent() {
-		return parent();
+	public MenuInflater getMenuInflater() {
+		return ((CSActivity) activity()).getSupportMenuInflater();
 	}
 
 	@SuppressWarnings("deprecation") public int getScreenOrientation() {
@@ -163,8 +176,17 @@ public abstract class ViewController extends Widget<View> {
 		else activity().onBackPressed();
 	}
 
+	protected void goHome() {
+		startActivity(new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME));
+	}
+
 	public boolean hasLayout() {
 		return is(_layoutId);
+	}
+
+	public void hide() {
+		if (is(_parentInView)) _parentInView.hideController();
+		else super.hide();
 	}
 
 	public Intent intent() {
@@ -181,6 +203,14 @@ public abstract class ViewController extends Widget<View> {
 
 	public boolean isDestroyed() {
 		return destroyed;
+	}
+
+	protected boolean isFirstTime() {
+		return no(state);
+	}
+
+	protected boolean isMainActionRun() {
+		return Intent.ACTION_MAIN.equals(activity().getIntent().getAction());
 	}
 
 	public boolean isPaused() {
@@ -202,7 +232,7 @@ public abstract class ViewController extends Widget<View> {
 					parent().onDestroy, parent().onBack, parent().onActivityResult,
 					parent().onCreateOptionsMenu, parent().onOptionsItemSelected,
 					parent().onPrepareOptionsMenu, parent().onKeyDown, parent().onNewIntent,
-					parent().onUserLeaveHint) {
+					parent().onUserLeaveHint, parent().onLowMemory) {
 				@SuppressWarnings("unchecked") public void run() {
 					if (event == parent().onBeforeCreate) onBeforeCreate((Bundle) argument);
 					else if (event == parent().onCreate) onCreate((Bundle) argument);
@@ -210,6 +240,7 @@ public abstract class ViewController extends Widget<View> {
 					else if (event == parent().onResume) onResume();
 					else if (event == parent().onPause) onPause();
 					else if (event == parent().onStop) onStop();
+					else if (event == parent().onLowMemory) onLowMemory();
 					else if (event == parent().onSaveInstance) onSaveInstanceState((Bundle) argument);
 					else if (event == parent().onDestroy) onDestroy();
 					else if (event == parent().onBack) onBackPressed((Value<Boolean>) argument);
@@ -225,6 +256,10 @@ public abstract class ViewController extends Widget<View> {
 			};
 	}
 
+	protected void onActivityResult(ActivityResult result) {
+		fire(onActivityResult, result);
+	}
+
 	public void onBackPressed(Value<Boolean> goBack) {
 		fire(onBack, goBack);
 		if (goBack.get()) goBack.set(onGoBack());
@@ -235,8 +270,36 @@ public abstract class ViewController extends Widget<View> {
 		fire(onBeforeCreate, state);
 	}
 
+	/**
+	 * initialize view
+	 */
+	protected void onCreate() {
+	}
+
+	protected void onCreate(Bundle state) {
+		this.state = state;
+		fire(onCreate, state);
+		onCreate();
+		if (no(state)) onCreateFirstTime();
+		else onCreateRestore(state);
+		created = true;
+		paused = NO;
+	}
+
+	/**
+	 * initialize view
+	 */
+	protected void onCreateFirstTime() {
+	}
+
 	public void onCreateOptionsMenu(OnMenu menu) {
 		fire(onCreateOptionsMenu, menu);
+	}
+
+	/**
+	 * initialize view
+	 */
+	protected void onCreateRestore(Bundle state) {
 	}
 
 	public void onDeinitialize(Bundle state) {
@@ -253,6 +316,10 @@ public abstract class ViewController extends Widget<View> {
 		fire(onDestroy);
 	}
 
+	protected Boolean onGoBack() {
+		return YES;
+	}
+
 	public void onInitialize(Bundle state) {
 		onBeforeCreate(state);
 		onCreate(state);
@@ -264,6 +331,10 @@ public abstract class ViewController extends Widget<View> {
 		fire(onKeyDown, onKey);
 	}
 
+	protected void onLowMemory() {
+		fire(onLowMemory);
+	}
+
 	public void onNewIntent(Intent intent) {
 		fire(onNewIntent, intent);
 	}
@@ -272,12 +343,70 @@ public abstract class ViewController extends Widget<View> {
 		fire(onOptionsItemSelected, item);
 	}
 
+	protected void onPause() {
+		resumed = false;
+		paused = true;
+		fire(onPause);
+	}
+
 	public void onPrepareOptionsMenu(OnMenu menu) {
 		fire(onPrepareOptionsMenu, menu);
 	}
 
+	/**
+	 * update view
+	 */
+	protected void onResume() {
+		resumed = true;
+		paused = false;
+		fire(onResume);
+	}
+
+	protected void onSaveInstanceState(Bundle state) {
+		fire(onSaveInstance, state);
+	}
+
+	protected void onStart() {
+		started = true;
+		fire(onStart);
+	}
+
+	protected void onStop() {
+		started = false;
+		state = null;
+		fire(onStop);
+	}
+
+	protected void onUserLeaveHint() {
+		fire(onUserLeaveHint);
+	}
+
+	protected void overridePendingTransition(int in, int out) {
+		activity().overridePendingTransition(in, out);
+	}
+
 	public ViewController parent() {
 		return _parent;
+	}
+
+	public void removeFragment(int id) {
+		Fragment fragment = getFragment(id);
+		if (fragment != null) getFragmentManager().beginTransaction().remove(fragment).commit();
+	}
+
+	protected void setActivity(Activity activity) {
+		if (paused) setView(null);
+		_activity = activity;
+		setContext(activity);
+	}
+
+	protected void setContentView(int layoutResId) {
+		activity().setContentView(layoutResId);
+	}
+
+	public void show() {
+		if (is(_parentInView)) _parentInView.showController(this);
+		else super.show();
 	}
 
 	public void startActivity(Class<? extends Activity> activityClass) {
@@ -318,104 +447,10 @@ public abstract class ViewController extends Widget<View> {
 		activity().finish();
 	}
 
-	protected Bundle getIntentExtras() {
-		return activity().getIntent().getExtras();
+	public void onHideFromInView() {
 	}
 
-	protected void goHome() {
-		startActivity(new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME));
-	}
-
-	protected boolean isFirstTime() {
-		return no(state);
-	}
-
-	protected boolean isMainActionRun() {
-		return Intent.ACTION_MAIN.equals(activity().getIntent().getAction());
-	}
-
-	protected void onActivityResult(ActivityResult result) {
-		fire(onActivityResult, result);
-	}
-
-	/**
-	 * initialize view
-	 */
-	protected void onCreate() {
-	}
-
-	protected void onCreate(Bundle state) {
-		this.state = state;
-		fire(onCreate, state);
-		onCreate();
-		if (no(state)) onCreateFirstTime();
-		else onCreateRestore(state);
-		created = true;
-		paused = NO;
-	}
-
-	/**
-	 * initialize view
-	 */
-	protected void onCreateFirstTime() {
-	}
-
-	/**
-	 * initialize view
-	 */
-	protected void onCreateRestore(Bundle state) {
-	}
-
-	protected Boolean onGoBack() {
-		return YES;
-	}
-
-	protected void onPause() {
-		resumed = false;
-		paused = true;
-		fire(onPause);
-	}
-
-	/**
-	 * update view
-	 */
-	protected void onResume() {
-		resumed = true;
-		paused = false;
-		fire(onResume);
-	}
-
-	protected void onSaveInstanceState(Bundle state) {
-		fire(onSaveInstance, state);
-	}
-
-	protected void onStart() {
-		started = true;
-		fire(onStart);
-	}
-
-	protected void onStop() {
-		started = false;
-		state = null;
-		fire(onStop);
-	}
-
-	protected void onUserLeaveHint() {
-		fire(onUserLeaveHint);
-	}
-
-	protected void overridePendingTransition(int in, int out) {
-		activity().overridePendingTransition(in, out);
-	}
-
-	protected void setActivity(Activity activity) {
-		if (paused) setView(null);
-		_activity = activity;
-		setContext(activity);
-	}
-
-	protected void setContentView(int layoutResId) {
-		activity().setContentView(layoutResId);
+	public void onInViewHide(ViewController controller) {
 	}
 
 }

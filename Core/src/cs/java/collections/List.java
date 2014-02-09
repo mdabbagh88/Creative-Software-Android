@@ -11,7 +11,7 @@ public interface List<T> extends java.util.List<T> {
 
 	int getIndex(T item);
 
-	boolean hasContents();
+	boolean hasSometing();
 
 	@Override @Deprecated int indexOf(Object arg0);
 
@@ -19,6 +19,8 @@ public interface List<T> extends java.util.List<T> {
 
 	T last();
 
+	int count();
+	
 	int lastIndex();
 
 	List<T> range(int fromIndex);
@@ -28,4 +30,6 @@ public interface List<T> extends java.util.List<T> {
 	@Override @Deprecated boolean remove(Object arg0);
 
 	T removeLast();
+
+	List<T> removeAll();
 }

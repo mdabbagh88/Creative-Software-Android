@@ -10,25 +10,21 @@ public class JSONTypeImpl implements JSONType {
 		this.value = value;
 	}
 
-	@Override
-	public JSONArray asArray() {
+	@Override public JSONArray asArray() {
 		return null;
 	}
 
-	@Override
-	public Boolean asBoolean() {
+	@Override public Boolean asBoolean() {
 		JSONBoolean json = asJSONBoolean();
 		if (is(json)) return json.get();
 		return null;
 	}
 
-	@Override
-	public JSONContainer asContainer() {
+	@Override public JSONContainer asContainer() {
 		return null;
 	}
 
-	@Override
-	public Double asDouble() {
+	@Override public Double asDouble() {
 		JSONNumber json = asJSONNumber();
 		if (is(json)) {
 			Number number = json.get();
@@ -37,49 +33,41 @@ public class JSONTypeImpl implements JSONType {
 		return null;
 	}
 
-	@Override
-	public JSONBoolean asJSONBoolean() {
+	@Override public JSONBoolean asJSONBoolean() {
 		return null;
 	}
 
-	@Override
-	public JSONNumber asJSONNumber() {
+	@Override public JSONNumber asJSONNumber() {
 		return null;
 	}
 
-	@Override
-	public JSONString asJSONString() {
+	@Override public JSONString asJSONString() {
 		return null;
 	}
 
-	@Override
-	public JSONObject asObject() {
+	@Override public JSONObject asObject() {
 		return null;
 	}
 
-	@Override
-	public String asString() {
+	@Override public String asString() {
 		JSONString jsonString = asJSONString();
 		if (is(jsonString)) return jsonString.get();
 		return null;
 	}
 
-	@Override
-	public JSONValue<?> asValue() {
+	@Override public JSONValue<?> asValue() {
 		return null;
 	}
 
-	@Override
-	public Object getValue() {
+	@Override public Object getValue() {
 		return value;
+	}
+
+	@Override public String toJSON() {
+		return String.valueOf(getValue());
 	}
 
 	@Override public String toString() {
 		return toJSON();
-	}
-	
-	@Override
-	public String toJSON() {
-		return String.valueOf(getValue());
 	}
 }

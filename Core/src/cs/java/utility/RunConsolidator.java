@@ -27,7 +27,7 @@ public class RunConsolidator implements Run {
 
 	@Override
 	public void run() {
-		if (runnables.hasContents()) {
+		if (runnables.hasSometing()) {
 			runnables.removeLast().run();
 			doLater(miliseconds, this);
 		} else isRunning = false;

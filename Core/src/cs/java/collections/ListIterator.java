@@ -3,19 +3,19 @@ package cs.java.collections;
 import java.util.List;
 
 public class ListIterator<T> extends GenericIterator<T> {
-	List<T> list;
+	private List<T> _list;
 
 	public ListIterator(List<T> list) {
 		super(list.size());
-		this.list = list;
+		this._list = list;
 	}
 
 	@Override protected T getValue() {
-		return list.get(index());
+		return _list.get(index());
 	}
 
 	@Override protected void onRemove() {
-		list.remove(index());
+		_list.remove(index());
 	}
 
 }

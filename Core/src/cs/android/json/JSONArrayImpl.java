@@ -3,6 +3,7 @@ package cs.android.json;
 import static cs.java.lang.Lang.error;
 
 import java.util.Iterator;
+import java.util.List;
 
 import org.json.JSONException;
 
@@ -18,6 +19,12 @@ public class JSONArrayImpl extends JsonArrayImplBase implements JSONArray {
 
 	public JSONArrayImpl() {
 		this(new org.json.JSONArray());
+	}
+	
+	public JSONArray loadStrings(List<String> objects) {
+		for (String string : objects)
+			add(string);
+		return this;
 	}
 
 	public JSONArrayImpl(org.json.JSONArray value) {

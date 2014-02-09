@@ -12,6 +12,7 @@ import java.net.URLEncoder;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import android.content.Intent;
@@ -51,6 +52,19 @@ public class Lang {
 		void start();
 
 		void stop();
+	}
+
+	public static <T> T newInstance(Class<T> itemsClass) {
+		try {
+			return itemsClass.newInstance();
+		} catch (Exception e) {
+			error(e);
+			return null;
+		}
+	}
+
+	public static String format(String format, Object... args) {
+		return String.format(Locale.ENGLISH, format, args);
 	}
 
 	public static final boolean YES = true;
@@ -574,15 +588,15 @@ public class Lang {
 	}
 
 	public static RuntimeException unexpected(Object... msg) {
-		return new RuntimeException(text("Unexpected").add(msg).toString());
+		return new RuntimeException(text("Unexpected ").add(string(" ", msg)).toString());
 	}
 
 	public static RuntimeException unimplemented(Object... msg) {
-		return new RuntimeException(text("Unimplemented").add(msg).toString());
+		return new RuntimeException(text("Unimplemented ").add(string(" ", msg)).toString());
 	}
 
 	public static RuntimeException unsuported(Object... msg) {
-		return new RuntimeException(text("Unsupported").add(msg).toString());
+		return new RuntimeException(text("Unsupported ").add(string(" ", msg)).toString());
 	}
 
 	public static String urlEncode(String argument) {

@@ -43,19 +43,19 @@ import cs.android.aq.CSQuery;
 import cs.java.collections.List;
 import cs.java.lang.Base;
 
-public abstract class ContextPresenter extends Base implements HasContext {
+public abstract class ContextController extends Base implements HasContext {
 
 	private Context context;
 	private CSQuery _aq;
 
-	public ContextPresenter() {
+	public ContextController() {
 	}
 
-	public ContextPresenter(Context context) {
+	public ContextController(Context context) {
 		setContext(context);
 	}
 
-	public ContextPresenter(HasContext context) {
+	public ContextController(HasContext context) {
 		setContext(context.context());
 	}
 

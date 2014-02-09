@@ -1,17 +1,19 @@
 package cs.android.viewbase;
 
 import static cs.java.lang.Lang.doLater;
-import static cs.java.lang.Lang.error;
 import static cs.java.lang.Lang.is;
 import static cs.java.lang.Lang.no;
 import static cs.java.lang.Lang.set;
 
+import java.io.File;
 import java.util.Calendar;
 import java.util.Date;
 
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.support.v4.view.ViewPager;
+import android.support.v7.widget.SearchView;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -28,6 +30,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -58,11 +61,15 @@ import cs.java.common.Point;
 import cs.java.lang.Call;
 import cs.java.lang.Run;
 
-public class Widget<T extends View> extends ContextPresenter implements IsView {
+public class Widget<T extends View> extends ContextController implements IsView {
 
 	public static int getTopRelativeTo(View view, View relativeTo) {
 		if (view.getParent() == relativeTo) return view.getTop();
 		return view.getTop() + getTopRelativeTo((View) view.getParent(), relativeTo);
+	}
+
+	protected static LayoutId layout(int id) {
+		return new LayoutId(id);
 	}
 
 	public static <T extends View> Widget<T> load(View view) {
@@ -73,13 +80,12 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		}
 	}
 
-	protected static LayoutId layout(int id) {
-		return new LayoutId(id);
-	}
-
 	private View view;
 
 	private CSQuery aq;
+
+	Widget() {
+	}
 
 	public Widget(HasContext hascontext) {
 		super(hascontext);
@@ -112,9 +118,6 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		this(parent.getView(viewId));
 	}
 
-	Widget() {
-	}
-
 	public CSQuery aq() {
 		if (no(aq)) aq = new CSQuery(this);
 		return aq;
@@ -126,6 +129,10 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 
 	public AbsListView asAbsListView() {
 		return (AbsListView) asView();
+	}
+
+	public AdapterView asAdapterView() {
+		return (AdapterView) asView();
 	}
 
 	public FrameLayout asFrame() {
@@ -146,6 +153,10 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 
 	public ProgressBar asProgressBar() {
 		return (ProgressBar) asView();
+	}
+
+	public TextView asTextView() {
+		return (TextView) asView();
 	}
 
 	@SuppressWarnings("unchecked") public T asView() {
@@ -251,6 +262,16 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		return (CompoundButton) getView(id);
 	}
 
+	protected Date getDate(DatePicker picker) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(picker.getYear(), picker.getMonth(), picker.getDayOfMonth());
+		return calendar.getTime();
+	}
+
+	protected Date getDate(int picker) {
+		return getDate(getDatePicker(picker));
+	}
+
 	public DatePicker getDatePicker(int id) {
 		return (DatePicker) getView(id);
 	}
@@ -313,8 +334,16 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		return (ScrollView) getView(id);
 	}
 
+	public SearchView getSearchView(int id) {
+		return (SearchView) getView(id);
+	}
+
 	public SeekBar getSeekBar(int i) {
 		return (SeekBar) getView(i);
+	}
+
+	protected Spinner getSpinner(int id) {
+		return (Spinner) getView(id);
 	}
 
 	public Switch getSwitch(int id) {
@@ -352,10 +381,7 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 
 	public View getView(int id) {
 		View child = asView().findViewById(id);
-		if (no(child)) {
-			error("View not found");
-			return null;
-		}
+		if (no(child)) return null;
 		return child;
 	}
 
@@ -369,6 +395,10 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 
 	public ViewGroup getViewGroup(int id) {
 		return (ViewGroup) getView(id);
+	}
+
+	public ViewPager getViewPager(int id) {
+		return (ViewPager) getView(id);
 	}
 
 	public WebView getWebView(int id) {
@@ -412,6 +442,14 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		return getCompoundButton(id).isChecked();
 	}
 
+	public boolean isHidden() {
+		return !isVisible();
+	}
+
+	private boolean isHidden(View view) {
+		return !isVisible(view);
+	}
+
 	public boolean isPortraite() {
 		return context().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
 	}
@@ -438,6 +476,14 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 
 	public void setImageValue(int imageViewId, int imageResource) {
 		getImageView(imageViewId).setImageResource(imageResource);
+	}
+
+	protected void setImageViewResource(int viewId, int drawable) {
+		getImageView(viewId).setImageResource(drawable);
+	}
+
+	protected void setInflateView(int layoutId) {
+		setView(inflateLayout(layoutId));
 	}
 
 	public void setInvisible() {
@@ -494,6 +540,17 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		view.setLayoutParams(layoutParams);
 	}
 
+	protected void setSpinnerData(Spinner spinner, List<String> strings) {
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(context(),
+				android.R.layout.simple_spinner_item, strings);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		spinner.setAdapter(adapter);
+	}
+
+	public void setText(int viewId, CharSequence text) {
+		getTextView(viewId).setText(text);
+	}
+
 	public void setText(int viewId, String text) {
 		getTextView(viewId).setText(text);
 	}
@@ -511,11 +568,6 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		if (is(view)) view.setTag(this);
 	}
 
-	public void setViewVisible(int viewId, boolean visible) {
-		if (visible) show(viewId);
-		else hide(viewId);
-	}
-
 	public void setVisibility(int value) {
 		asView().setVisibility(value);
 	}
@@ -527,6 +579,11 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 
 	public void show() {
 		show(asView());
+	}
+
+	public void show(boolean visible, int viewId) {
+		if (visible) show(viewId);
+		else hide(viewId);
 	}
 
 	public void show(int viewId, int... viewIds) {
@@ -541,6 +598,20 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 
 	public void showSoftInput(View view, int flag) {
 		((InputMethodManager) getService(Context.INPUT_METHOD_SERVICE)).showSoftInput(view, flag);
+	}
+
+	public String text() {
+		return asTextView().getText() + "";
+	}
+
+	public Widget<T> text(int string) {
+		aq().text(string);
+		return this;
+	}
+
+	public Widget<T> text(String string) {
+		aq().text(string);
+		return this;
 	}
 
 	public float toDp(float pixel) {
@@ -565,37 +636,12 @@ public class Widget<T extends View> extends ContextPresenter implements IsView {
 		return new Widget<View>(this, id);
 	}
 
-	private boolean isHidden(View view) {
-		return !isVisible(view);
+	public void image(String url) {
+		aq().image(url);
 	}
 
-	protected Date getDate(DatePicker picker) {
-		Calendar calendar = Calendar.getInstance();
-		calendar.set(picker.getYear(), picker.getMonth(), picker.getDayOfMonth());
-		return calendar.getTime();
-	}
-
-	protected Date getDate(int picker) {
-		return getDate(getDatePicker(picker));
-	}
-
-	protected Spinner getSpinner(int id) {
-		return (Spinner) getView(id);
-	}
-
-	protected void setImageViewResource(int viewId, int drawable) {
-		getImageView(viewId).setImageResource(drawable);
-	}
-
-	protected void setInflateView(int layoutId) {
-		setView(inflateLayout(layoutId));
-	}
-
-	protected void setSpinnerData(Spinner spinner, List<String> strings) {
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(context(),
-				android.R.layout.simple_spinner_item, strings);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinner.setAdapter(adapter);
+	public void image(File file) {
+		aq().image(file);
 	}
 
 }

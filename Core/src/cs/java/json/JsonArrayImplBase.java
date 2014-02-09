@@ -28,7 +28,7 @@ public abstract class JsonArrayImplBase extends JSONTypeImpl implements JSONArra
         if (is(value)) {
             JSONArray typevalue = value.asArray();
             if (is(typevalue)) return typevalue;
-            throw exception("Expected JSONObject, found ", value.getValue());
+            throw exception("Expected JSONArray, found ", value.getValue());
         }
         return null;
     }

@@ -8,6 +8,7 @@ import java.util.Map;
 import cs.java.collections.Mapped;
 
 public abstract class JSONImplBase implements JSON {
+
 	@Override public <T extends JSONData> JSONArray create(List<T> objects) {
 		JSONArray array = createArray();
 		for (T jsonData : objects)
@@ -28,4 +29,5 @@ public abstract class JSONImplBase implements JSON {
 			object.put(item.key(), item.value().save());
 		return object;
 	}
+
 }

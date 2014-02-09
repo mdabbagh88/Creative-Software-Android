@@ -7,10 +7,10 @@ import java.io.File;
 import android.os.Environment;
 import cs.android.lang.Application;
 import cs.android.lang.CSLogger;
-import cs.android.viewbase.ContextPresenter;
+import cs.android.viewbase.ContextController;
 import cs.java.lang.Lang;
 
-public abstract class ApplicationBase extends ContextPresenter implements Application {
+public abstract class ApplicationBase extends ContextController implements Application {
 
 	private CSLogger _logger;
 

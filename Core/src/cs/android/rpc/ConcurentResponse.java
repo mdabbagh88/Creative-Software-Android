@@ -57,8 +57,8 @@ public class ConcurentResponse extends Response<Void> {
 
 	private void onResponseFailed(Response failedResponse) {
 		failed(failedResponse);
-		for (Response response : _responses)
-			if (response != failedResponse) response.cancel();
+//		for (Response response : _responses)
+//			if (response != failedResponse) response.cancel();
 	}
 
 }

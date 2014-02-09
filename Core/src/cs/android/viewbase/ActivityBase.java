@@ -128,6 +128,11 @@ public abstract class ActivityBase extends ActionBarActivity implements CSActivi
 		presenter.onStop();
 		super.onStop();
 	}
+	
+	public void onLowMemory() {
+		presenter.onLowMemory();
+		super.onLowMemory();
+	}
 
 	protected void onUserLeaveHint() {
 		presenter.onUserLeaveHint();

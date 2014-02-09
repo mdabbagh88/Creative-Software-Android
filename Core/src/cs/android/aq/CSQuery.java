@@ -6,20 +6,20 @@ import com.androidquery.AQuery;
 import com.androidquery.AbstractAQuery;
 import com.androidquery.callback.ImageOptions;
 
-import cs.android.viewbase.ContextPresenter;
+import cs.android.viewbase.ContextController;
 import cs.android.viewbase.ViewController;
 import cs.android.viewbase.Widget;
 
 public class CSQuery extends AbstractAQuery<CSQuery> {
 
-	private ContextPresenter _cp;
+	private ContextController _cp;
 
 	public CSQuery(ViewController controller) {
 		super(controller.activity());
 		_cp = controller;
 	}
 
-	public CSQuery(ContextPresenter controller) {
+	public CSQuery(ContextController controller) {
 		super(controller.context());
 		_cp = controller;
 	}

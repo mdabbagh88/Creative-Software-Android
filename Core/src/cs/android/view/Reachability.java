@@ -7,10 +7,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
-import cs.android.viewbase.ContextPresenter;
+import cs.android.viewbase.ContextController;
 import cs.java.event.Event;
 
-public class Reachability extends ContextPresenter {
+public class Reachability extends ContextController {
 
 	private final BroadcastReceiver receiver = new BroadcastReceiver() {
 		@Override public void onReceive(Context context, Intent intent) {

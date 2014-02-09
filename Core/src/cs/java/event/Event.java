@@ -11,4 +11,6 @@ public interface Event<T> {
 	EventRegistration add(Listener listener);
 
 	void run(T arg);
+
+	void clear();
 }
