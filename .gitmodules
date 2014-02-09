@@ -1,0 +1,18 @@
+[submodule "pinned-section-listview"]
+	path = pinned-section-listview
+	url = https://github.com/beworker/pinned-section-listview
+[submodule "ActionBar-PullToRefresh"]
+	path = ActionBar-PullToRefresh
+	url = https://github.com/chrisbanes/ActionBar-PullToRefresh
+[submodule "SmoothProgressBar"]
+	path = SmoothProgressBar
+	url = https://github.com/castorflex/SmoothProgressBar
+[submodule "EnhancedListView"]
+	path = EnhancedListView
+	url = https://github.com/timroes/EnhancedListView
+[submodule "NineOldAndroids"]
+	path = NineOldAndroids
+	url = https://github.com/JakeWharton/NineOldAndroids/
+[submodule "ListViewAnimations"]
+	path = ListViewAnimations
+	url = https://github.com/nhaarman/ListViewAnimations
